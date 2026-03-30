@@ -4,33 +4,300 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Diluição de Medicamentos</title>
-
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
-    <link rel="stylesheet" href="styles.css">
-</head>
+    <style>
+        :root {
+    --primary-color: #1976d2;
+    --primary-light: #63a4ff;
+    --primary-dark: #004ba0;
+    --secondary-color: #dc004e;
+    --background: #f5f5f5;
+    --surface: #ffffff;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --error: #d32f2f;
+    --warning-bg: #ffebee;
+    --warning-text: #d32f2f;
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: var(--background);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 15px;
+}
+
+.container {
+    background-color: var(--surface);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 25px;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+form label {
+    font-weight: 500;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+
+form#calcForm label[for="medicamento"] {
+    margin-top: 2mm;
+    margin-bottom: 5px;
+}
+
+form#calcForm label[for="dilution"] {
+    margin-bottom: 5px;
+}
+
+input, select {
+    padding: 12px 15px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--surface);
+    transition: box-shadow 0.3s ease;
+    margin-top: 0;
+}
+
+input[type="text"] {
+    appearance: textfield;
+}
+
+input[type="text"]::-webkit-inner-spin-button,
+input[type="text"]::-webkit-outer-spin-button {
+    appearance: none;
+}
+
+select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23757575" height="12" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18l-10-10h20z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 24px;
+    padding-right: 36px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+select#dilution.single-option {
+    background-image: none;
+    padding-right: 15px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+input.invalid {
+    border-color: var(--error);
+}
+
+#doseRange {
+    color: var(--text-secondary);
+    font-size: 12px;
+    display: block;
+    margin-top: 5px;
+}
+
+#aviso {
+    margin-top: 4px;
+}
+
+#pesoNote {
+    color: var(--text-secondary);
+    font-size: 12px;
+    display: none;
+    margin-top: 5px;
+}
+
+button {
+    padding: 12px;
+    font-size: 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--shadow);
+    width: 100%;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+button:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:active:not(:disabled) {
+    background-color: var(--primary-dark);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.resultado {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 5px;
+    background-color: var(--surface);
+    color: var(--text-primary);
+    font-size: 16px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease;
+}
+
+.resultado:empty {
+    display: none;
+}
+
+.aviso {
+    display: block;
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+    border-radius: 8px;
+    border: 1px solid rgba(211, 47, 47, 0.2);
+    margin-top: 4px;
+    padding: 12px;
+    font-size: 15px;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+.aviso-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.aviso .aviso-icon {
+    font-size: 18px;
+    line-height: 1;
+    transform: translateY(2px);
+    flex-shrink: 0;
+}
+
+.aviso-text {
+    line-height: 1.4;
+}
+
+.aviso-item {
+    margin: 0 0 4px 0;
+}
+
+.resultado.erro {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid rgba(211, 47, 47, 0.2);
+    text-align: left;
+}
+
+.resultado.erro .aviso-icon {
+    font-size: 16px;
+    line-height: 1;
+    transform: translateY(4px);
+    flex-shrink: 0;
+}
+
+@media (max-width: 500px) {
+    .container {
+        margin: 16px;
+        padding: 16px;
+    }
+    h1 {
+        font-size: 20px;
+    }
+    button {
+        padding: 10px;
+    }
+    .aviso {
+        padding: 12px;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+    .aviso-inner {
+        gap: 6px;
+    }
+    .aviso .aviso-icon {
+        font-size: 14px;
+        transform: translateY(1px);
+    }
+    .resultado.erro .aviso-icon {
+        font-size: 14px;
+        transform: translateY(3px);
+    }
+}
+    </style>
+</head>
 <body>
     <div class="container">
         <h1>Calculadora de Diluição de Medicamentos</h1>
-
+        
         <form id="calcForm">
-
-            <!-- Peso -->
             <div class="campo" id="pesoContainer">
                 <label for="peso">Peso do Paciente (kg):</label>
                 <input type="text" id="peso" placeholder="Ex: 50" required>
                 <small id="pesoNote"></small>
             </div>
 
-            <!-- Medicamento -->
             <div class="campo">
                 <label for="medicamento">Selecione o Medicamento:</label>
                 <select id="medicamento" required>
-                    <!-- (mantido igual ao seu original) -->
+                    <optgroup label="Aminas">
+                        <option value="noradrenalina">Noradrenalina</option>
+                        <option value="dobutamina">Dobutamina</option>
+                        <option value="dopamina">Dopamina</option>
+                        <option value="nitroprussiato">Nitroprussiato</option>
+                        <option value="nitroglicerina">Nitroglicerina</option>
+                        <option value="vasopressina">Vasopressina</option>
+                    </optgroup>
+                    <optgroup label="Sedação">
+                        <option value="midazolam">Midazolam</option>
+                        <option value="fentanil">Fentanil</option>
+                        <option value="remifentanil">Remifentanil</option>
+                        <option value="escetamina">Escetamina</option>
+                        <option value="propofol">Propofol</option>
+                        <option value="dexmedetomidina">Dexmedetomidina</option>
+                    </optgroup>
+                    <optgroup label="Bloqueadores">
+                        <option value="pancuronio">Pancurônio</option>
+                        <option value="rocuronio">Rocurônio</option>
+                        <option value="cisatracurio">Cisatracúrio</option>
+                    </optgroup>
                 </select>
             </div>
 
-            <!-- Diluição -->
             <div class="campo">
                 <label for="dilution">Selecione a Diluição:</label>
                 <select id="dilution" required></select>
@@ -39,19 +306,498 @@
             <small id="doseRange"></small>
             <div id="aviso" class="aviso"></div>
 
-            <!-- Dose -->
             <div class="campo">
                 <label for="dose">Dose Desejada:</label>
-                <input type="text" id="dose" placeholder="Ex: 5" required>
-                <small id="doseUnit"></small>
+                <input type="text" id="dose" placeholder="Ex: 5" aria-describedby="doseUnit" required>
+                <small id="doseUnit" aria-label="Unidade da dose desejada"></small>
             </div>
 
             <button type="submit" disabled>Calcular</button>
         </form>
 
-        <div id="resultado" class="resultado"></div>
+        <div id="resultado" class="resultado" aria-live="polite"></div>
     </div>
+    <script>
+const medicamentosConfig = {
+    noradrenalina: { 
+        diluicoes: [
+            { amp: '2 amp/242ml SG 5%', concentracao: 0.032 },
+            { amp: '4 amp/234ml SG 5%', concentracao: 0.064 },
+            { amp: '8 amp/218ml SG 5%', concentracao: 0.128 }
+        ], 
+        unidadeDose: 'mcg/kg/min', 
+        perKg: true, 
+        perMin: true, 
+        doseMin: 0.02, 
+        doseMax: 3.3, 
+        aviso: 'Dose inicial: 0.05 a 0.15 mcg/kg/min. Manutenção: 0.025 a 1 mcg/kg/min. Máxima: 1 a 3.3 mcg/kg/min' 
+    },
+    dobutamina: { 
+        diluicoes: [
+            { amp: '1 amp/230ml', concentracao: 1 },
+            { amp: '2 amp/210ml', concentracao: 2 }
+        ], 
+        unidadeDose: 'mcg/kg/min', 
+        perKg: true, 
+        perMin: true, 
+        doseMin: 2, 
+        doseMax: 20, 
+        aviso: 'Dose inicial: 2 a 5 mcg/kg/min. Manutenção: 2 a 10 mcg/kg/min. Máxima: 20 mcg/kg/min' 
+    },
+    dopamina: { 
+        diluicoes: [
+            { amp: '5 amp/200ml', concentracao: 1 },
+            { amp: '10 amp/150ml', concentracao: 2 }
+        ], 
+        unidadeDose: 'mcg/kg/min', 
+        perKg: true, 
+        perMin: true, 
+        doseMin: 2, 
+        doseMax: 20, 
+        aviso: 'Dose inicial: 2 a 5 mcg/kg/min. Manutenção: 2 a 20 mcg/kg/min. Máxima: 20 mcg/kg/min' 
+    },
+    nitroprussiato: { 
+        diluicoes: [
+            { amp: '1 amp/248ml', concentracao: 0.2 },
+            { amp: '2 amp/246ml', concentracao: 0.4 }
+        ], 
+        unidadeDose: 'mcg/kg/min', 
+        perKg: true, 
+        perMin: true, 
+        doseMin: 0.2, 
+        doseMax: 10, 
+        aviso: '' 
+    },
+    nitroglicerina: { 
+        diluicoes: [{ amp: '1 amp/240ml', concentracao: 0.2 }], 
+        unidadeDose: 'mcg/min', 
+        perKg: false, 
+        perMin: true, 
+        doseMin: 5, 
+        doseMax: 100, 
+        aviso: 'Iniciar com 1,5 ml/h e no máximo 30 ml/h.' 
+    },
+    vasopressina: { 
+        diluicoes: [
+            { amp: '1ml (20UI)/49ml', concentracao: 1, fatorTaxa: 60 },
+            { amp: '2ml (40UI)/98ml', concentracao: 2, fatorTaxa: 30 }
+        ], 
+        unidadeDose: 'UI/min', 
+        perKg: false, 
+        perMin: true, 
+        doseMin: 0.01, 
+        doseMax: 0.04, 
+        baseUnit: 'UI', 
+        aviso: 'Dose inicial: 0.03 UI/min. Manutenção: 0.01 a 0.04 UI/min. > 0.04 UI/min causa isquemia cardíaca' 
+    },
+    midazolam: { 
+        diluicoes: [
+            { amp: '3 amp 50mg/220ml', concentracao: 0.6, calculoEspecial: (peso, dose) => peso * dose / 0.6 },
+            { amp: '5 amp 50mg/200ml', concentracao: 1, calculoEspecial: (peso, dose) => peso * dose },
+            { amp: 'Ampola Pura (5 mg/ml)', concentracao: 5 }
+        ], 
+        unidadeDose: 'mg/kg/h', 
+        perKg: true, 
+        perMin: false, 
+        doseMin: 0.02, 
+        doseMax: 0.6, 
+        aviso: 'Opção "Ampola Pura" apenas para doses muito baixas ou bolus, verificar protocolo.' 
+    },
+    fentanil: { 
+        diluicoes: [
+            { amp: '5 amp 50ml/150ml', concentracao: 0.0125 },
+            { amp: '10 amp 100ml/100ml', concentracao: 0.025 },
+            { amp: 'Ampola Pura (0.05 mg/ml)', concentracao: 0.05 }
+        ], 
+        unidadeDose: 'mcg/kg/h', 
+        perKg: true, 
+        perMin: false, 
+        doseMin: 0.7, 
+        doseMax: 10, 
+        aviso: 'Opção "Ampola Pura" apenas para doses muito baixas ou bolus, verificar protocolo.' 
+    },
+    remifentanil: { 
+        diluicoes: [{ amp: '5 amp 10ml/190ml', concentracao: 0.05 }], 
+        unidadeDose: 'mcg/kg/h', 
+        perKg: true, 
+        perMin: false, 
+        doseMin: 0.5, 
+        doseMax: 15, 
+        aviso: '' 
+    },
+    escetamina: { 
+        diluicoes: [{ amp: '20ml/230ml', concentracao: 4 }], 
+        unidadeDose: 'mg/kg/h', 
+        perKg: true, 
+        perMin: false, 
+        doseMin: 0.25, 
+        doseMax: 0.5, 
+        aviso: 'Contra indicado em Hipertensão intracraniana, insuficiência coronariana e distúrbios psiquiátricos' 
+    },
+    propofol: { 
+        diluicoes: [{ amp: '10 amp - 200 ml', concentracao: 10 }], 
+        unidadeDose: 'mg/kg/h', 
+        perKg: true, 
+        perMin: false, 
+        doseMin: 0.5, 
+        doseMax: 5, 
+        aviso: 'Iniciar com 0.5 e aumentar 0.5 a cada 5 a 10min. Trocar a solução a cada 6 a 12h' 
+    },
+    dexmedetomidina: { 
+        diluicoes: [{ amp: '4 amp - 96 ml', concentracao: 0.004 }], 
+        unidadeDose: 'mcg/kg/h', 
+        perKg: true, 
+        perMin: false, 
+        doseMin: 0.2, 
+        doseMax: 1.5, 
+        aviso: 'Iniciar com 0,5 ml/h e aumentar a cada 5 a 10min. Trocar a solução a cada 6 a 12h.' 
+    },
+    pancuronio: { 
+        diluicoes: [{ amp: '20 amp - 180 ml', concentracao: 0.2 }], 
+        unidadeDose: 'mg/kg/h', 
+        perKg: true, 
+        perMin: false, 
+        doseMin: 0.021, 
+        doseMax: 0.3, 
+        aviso: '' 
+    },
+    rocuronio: { 
+        diluicoes: [{ amp: '25 amp - 225 ml', concentracao: 1 }], 
+        unidadeDose: 'mg/kg/h', 
+        perKg: true, 
+        perMin: false, 
+        doseMin: 0.3, 
+        doseMax: 0.6, 
+        aviso: '' 
+    },
+    cisatracurio: { 
+        diluicoes: [{ amp: '50 amp - 200 ml', concentracao: 0.4 }], 
+        unidadeDose: 'mg/kg/h', 
+        perKg: true, 
+        perMin: false, 
+        doseMin: 0.06, 
+        doseMax: 0.8, 
+        aviso: 'Dose inicial: 0.1 a 0.2 mg/kg bolus (ou 15mg bolus)' 
+    }
+};
 
-    <script src="script.js"></script>
+document.getElementById('medicamento').addEventListener('change', updateDoseInfo);
+
+// Flag para rastrear se um cálculo já foi realizado
+let hasCalculated = false;
+
+// Variáveis para armazenar últimos valores válidos
+let lastValidPeso = '';
+let lastValidDose = '';
+
+// Função para atualizar as informações de dose, diluições e visibilidade do campo de peso
+function updateDoseInfo() {
+    const medicamento = document.getElementById('medicamento').value;
+    const config = medicamentosConfig[medicamento];
+    document.getElementById('doseUnit').textContent = config.unidadeDose;
+    document.getElementById('doseRange').textContent = `Dose recomendada: ${config.doseMin} - ${config.doseMax} ${config.unidadeDose}`;
+
+    const avisoElement = document.getElementById('aviso');
+
+    if (config.aviso) {
+        const avisosArray = config.aviso.split('. ').map(s => s.trim()).filter(Boolean);
+        const items = avisosArray.map(item => `<div class="aviso-item">• ${item.replace(/\.$/, '')}.</div>`).join('');
+        avisoElement.innerHTML = `<div class="aviso-inner">
+            <span class="aviso-icon" aria-hidden="true">⚠</span>
+            <div class="aviso-text">${items}</div>
+        </div>`;
+        avisoElement.style.display = 'block';
+    } else {
+        avisoElement.innerHTML = '';
+        avisoElement.style.display = 'none';
+    }
+
+    const dilutionSelect = document.getElementById('dilution');
+    dilutionSelect.innerHTML = '';
+    config.diluicoes.forEach((dil, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = dil.amp ? dil.amp : `Padrão`;
+        dilutionSelect.appendChild(option);
+    });
+
+    // Adicionar ou remover classe 'single-option' com base no número de diluições
+    if (config.diluicoes.length === 1) {
+        dilutionSelect.classList.add('single-option');
+    } else {
+        dilutionSelect.classList.remove('single-option');
+    }
+
+    // Limpar dose desejada e resultado ao mudar medicamento
+    document.getElementById('dose').value = '';
+    document.getElementById('resultado').innerHTML = '';
+    document.getElementById('resultado').classList.remove('erro');
+    hasCalculated = false; // Resetar flag ao mudar medicamento
+
+    // Mostrar/ocultar campo de peso
+    const pesoContainer = document.getElementById('pesoContainer');
+    const pesoInput = document.getElementById('peso');
+    const pesoNote = document.getElementById('pesoNote');
+    if (config.perKg) {
+        pesoContainer.style.display = 'block';
+        pesoInput.required = true;
+        pesoNote.textContent = '';
+    } else {
+        pesoContainer.style.display = 'none';
+        pesoInput.required = false;
+        pesoInput.value = ''; // Limpar peso se não for necessário
+        pesoNote.textContent = 'Peso não necessário para este medicamento.';
+        pesoNote.style.display = 'block';
+    }
+
+    updateButtonState();
+}
+
+// Função para atualizar o estado do botão de submit
+function updateButtonState() {
+    const medicamento = document.getElementById('medicamento').value;
+    const config = medicamentosConfig[medicamento];
+    const pesoRaw = document.getElementById('peso').value;
+    const peso = parseFloat(pesoRaw.replace(',', '.'));
+    const doseRaw = document.getElementById('dose').value;
+    const dose = parseFloat(doseRaw.replace(',', '.'));
+    const dilutionIndex = document.getElementById('dilution').value;
+    const button = document.querySelector('button[type="submit"]');
+    const pesoInput = document.getElementById('peso');
+    const doseInput = document.getElementById('dose');
+
+    const isValid = (config.perKg ? !isNaN(peso) && peso > 0 && peso <= 650 : true) &&
+                    !isNaN(dose) && dose > 0 &&
+                    dose >= config.doseMin && dose <= config.doseMax &&
+                    dilutionIndex !== '';
+
+    button.disabled = !isValid;
+
+    // Feedback visual para peso inválido
+    if (config.perKg && (!isNaN(peso) && (peso <= 0 || peso > 650))) {
+        pesoInput.classList.add('invalid');
+        pesoInput.setAttribute('aria-invalid', 'true');
+    } else {
+        pesoInput.classList.remove('invalid');
+        pesoInput.removeAttribute('aria-invalid');
+    }
+
+    // Feedback visual para dose inválida (negativa, zero ou fora do range)
+    if (!isNaN(dose) && (dose <= 0 || dose < config.doseMin || dose > config.doseMax)) {
+        doseInput.classList.add('invalid');
+        doseInput.setAttribute('aria-invalid', 'true');
+    } else {
+        doseInput.classList.remove('invalid');
+        doseInput.removeAttribute('aria-invalid');
+    }
+}
+
+// Função para calcular a taxa de infusão
+function calcularTaxaInfusao() {
+    const pesoInput = document.getElementById('peso');
+    const pesoRaw = pesoInput.value;
+    const peso = parseFloat(pesoRaw.replace(',', '.'));
+    const medicamento = document.getElementById('medicamento').value;
+    const doseRaw = document.getElementById('dose').value;
+    const dose = parseFloat(doseRaw.replace(',', '.'));
+    const dilutionIndex = parseInt(document.getElementById('dilution').value);
+    const resultadoDiv = document.getElementById('resultado');
+
+    resultadoDiv.innerHTML = ''; // Limpar resultado anterior
+    resultadoDiv.classList.remove('erro');
+
+    const config = medicamentosConfig[medicamento];
+    if (!config.diluicoes[dilutionIndex]) {
+        mostrarErro(resultadoDiv, 'Diluição inválida selecionada.');
+        return false;
+    }
+    const dil = config.diluicoes[dilutionIndex];
+
+    // Validações
+    if (config.perKg && (isNaN(peso) || peso <= 0 || peso > 650)) { 
+        mostrarErro(resultadoDiv, 'Por favor, insira um peso válido entre 0.01 e 650 kg'); 
+        return false; 
+    }
+    if (isNaN(dose) || dose <= 0) { 
+        mostrarErro(resultadoDiv, 'Por favor, insira uma dose válida maior que zero'); 
+        return false; 
+    }
+    if (dose < config.doseMin || dose > config.doseMax) {
+        mostrarErro(resultadoDiv, `A dose deve estar entre ${config.doseMin} e ${config.doseMax} ${config.unidadeDose}`);
+        return false;
+    }
+
+    let taxaInfusao;
+
+    // Lógica específica para Midazolam com cálculo especial
+    if (medicamento === 'midazolam' && dil.calculoEspecial) {
+        taxaInfusao = dil.calculoEspecial(peso, dose);
+    }
+    // Lógica específica para Vasopressina
+    else if (medicamento === 'vasopressina') {
+        taxaInfusao = dose * dil.fatorTaxa;
+    } else {
+        // Lógica geral para outros medicamentos
+        let doseH = dose;
+        if (config.perKg) doseH *= peso; // Ajusta para peso
+        if (config.perMin) doseH *= 60; // Converte min para hora
+
+        // Arredondamento intermediário para precisão
+        doseH = parseFloat(doseH.toFixed(6));
+
+        // Determina a unidade base da dose
+        const doseUnit = config.unidadeDose.split('/')[0]; // Ex.: 'mcg', 'mg', 'UI'
+
+        // Ajusta a concentração para a mesma unidade da dose
+        let concAdjusted = dil.concentracao;
+        if (doseUnit === 'mcg') {
+            concAdjusted = dil.concentracao * 1000; // mg/ml para mcg/ml
+        } else if (doseUnit === 'mg' || doseUnit === 'UI') {
+            concAdjusted = dil.concentracao; // mg/ml ou UI/ml
+        }
+
+        // Validação de concentração ajustada
+        if (concAdjusted <= 0) {
+            mostrarErro(resultadoDiv, 'Concentração inválida na configuração do medicamento.');
+            return false;
+        }
+
+        taxaInfusao = doseH / concAdjusted;
+    }
+
+    resultadoDiv.innerHTML = `Taxa de infusão: ${taxaInfusao.toFixed(2)} ml/h`;
+    hasCalculated = true; // Marcar que um cálculo foi realizado
+    return true;
+}
+
+// Função para mostrar erro
+function mostrarErro(element, mensagem) {
+    element.innerHTML = `<div class="aviso-inner">
+        <span class="aviso-icon" aria-hidden="true">⚠</span>
+        <div class="aviso-text">${mensagem}</div>
+    </div>`;
+    element.classList.add('erro');
+    element.setAttribute('role', 'alert');
+}
+
+// Função para validar entrada de peso (até 3 dígitos antes e 3 após a vírgula)
+function validatePesoInput(input) {
+    let value = input.value;
+
+    // Se vazio, aceitar e atualizar último válido vazio
+    if (!value) {
+        lastValidPeso = '';
+        input.value = '';
+        return;
+    }
+
+    // Normalizar entrada: substituir ponto por vírgula
+    value = value.replace(/\./g, ',');
+
+    // Não pode começar com vírgula
+    if (/^,/.test(value)) {
+        input.value = lastValidPeso;
+        return;
+    }
+
+    // Não pode ter mais de uma vírgula
+    if ((value.match(/,/g) || []).length > 1) {
+        input.value = lastValidPeso;
+        return;
+    }
+
+    // Regex para até 3 dígitos antes e até 3 dígitos após a vírgula
+    if (!/^[0-9]{0,3}(,[0-9]{0,3})?$/.test(value)) {
+        input.value = lastValidPeso;
+        return;
+    }
+
+    // Verificar se o valor numérico excede 650
+    const numericValue = parseFloat(value.replace(',', '.'));
+    if (!isNaN(numericValue) && numericValue > 650) {
+        input.value = lastValidPeso;
+        return;
+    }
+
+    // Atualizar valor do input e último valor válido
+    input.value = value;
+    lastValidPeso = value;
+}
+
+// Função para validar entrada de dose (até 3 dígitos antes e 3 após a vírgula)
+function validateDoseInput(input) {
+    let value = input.value;
+
+    // Se vazio, aceitar e atualizar último válido vazio
+    if (!value) {
+        lastValidDose = '';
+        input.value = '';
+        return;
+    }
+
+    // Normalizar entrada: substituir ponto por vírgula
+    value = value.replace(/\./g, ',');
+
+    // Não pode começar com vírgula
+    if (/^,/.test(value)) {
+        input.value = lastValidDose;
+        return;
+    }
+
+    // Não pode ter mais de uma vírgula
+    if ((value.match(/,/g) || []).length > 1) {
+        input.value = lastValidDose;
+        return;
+    }
+
+    // Regex para até 3 dígitos antes e até 3 dígitos após a vírgula
+    if (!/^[0-9]{0,3}(,[0-9]{0,3})?$/.test(value)) {
+        input.value = lastValidDose;
+        return;
+    }
+
+    // Atualizar valor do input e último valor válido
+    input.value = value;
+    lastValidDose = value;
+}
+
+// Evento de submissão do formulário
+document.getElementById('calcForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    calcularTaxaInfusao();
+});
+
+// Evento de mudança na diluição
+document.getElementById('dilution').addEventListener('change', function() {
+    updateButtonState();
+    // Recalcular automaticamente apenas se já houve um cálculo
+    if (hasCalculated) {
+        calcularTaxaInfusao();
+    }
+});
+
+// Evento de entrada no peso
+document.getElementById('peso').addEventListener('input', function() {
+    validatePesoInput(this);
+    const resultadoDiv = document.getElementById('resultado');
+    resultadoDiv.innerHTML = ''; // Limpar resultado em qualquer alteração do peso
+    resultadoDiv.classList.remove('erro');
+    hasCalculated = false; // Resetar flag em qualquer alteração do peso
+    updateButtonState();
+});
+
+// Evento de entrada na dose
+document.getElementById('dose').addEventListener('input', function() {
+    validateDoseInput(this);
+    const resultadoDiv = document.getElementById('resultado');
+    resultadoDiv.innerHTML = ''; // Limpar resultado em qualquer alteração da dose
+    resultadoDiv.classList.remove('erro');
+    hasCalculated = false; // Resetar flag em qualquer alteração da dose
+    updateButtonState();
+});
+
+// Inicializar informações
+updateDoseInfo();
+    </script>
 </body>
 </html>
