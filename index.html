@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Diluição de Medicamentos</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Calculadora de Diluição de Medicamentos</h1>
+
+        <form id="calcForm">
+
+            <!-- Peso -->
+            <div class="campo" id="pesoContainer">
+                <label for="peso">Peso do Paciente (kg):</label>
+                <input type="text" id="peso" placeholder="Ex: 50" required>
+                <small id="pesoNote"></small>
+            </div>
+
+            <!-- Medicamento -->
+            <div class="campo">
+                <label for="medicamento">Selecione o Medicamento:</label>
+                <select id="medicamento" required>
+                    <!-- (mantido igual ao seu original) -->
+                </select>
+            </div>
+
+            <!-- Diluição -->
+            <div class="campo">
+                <label for="dilution">Selecione a Diluição:</label>
+                <select id="dilution" required></select>
+            </div>
+
+            <small id="doseRange"></small>
+            <div id="aviso" class="aviso"></div>
+
+            <!-- Dose -->
+            <div class="campo">
+                <label for="dose">Dose Desejada:</label>
+                <input type="text" id="dose" placeholder="Ex: 5" required>
+                <small id="doseUnit"></small>
+            </div>
+
+            <button type="submit" disabled>Calcular</button>
+        </form>
+
+        <div id="resultado" class="resultado"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
