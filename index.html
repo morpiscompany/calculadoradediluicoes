@@ -281,6 +281,7 @@ button:active:not(:disabled) {
                         <option value="nitroprussiato">Nitroprussiato</option>
                         <option value="nitroglicerina">Nitroglicerina</option>
                         <option value="vasopressina">Vasopressina</option>
+                        <option value="epinefrina">Epinefrina</option>
                     </optgroup>
                     <optgroup label="Sedação">
                         <option value="midazolam">Midazolam</option>
@@ -334,8 +335,9 @@ const medicamentosConfig = {
     },
     dobutamina: { 
         diluicoes: [
-            { amp: '1 amp/230ml', concentracao: 1 },
-            { amp: '2 amp/210ml', concentracao: 2 }
+            { amp: '20ml/230ml (1mg/ml)', concentracao: 1 },
+            { amp: '40ml/210ml (2mg/ml)', concentracao: 2 },
+            { amp: '80ml/170ml (4mg/ml)', concentracao: 4 }
         ], 
         unidadeDose: 'mcg/kg/min', 
         perKg: true, 
@@ -390,6 +392,19 @@ const medicamentosConfig = {
         baseUnit: 'UI', 
         aviso: 'Dose inicial: 0.03 UI/min. Manutenção: 0.01 a 0.04 UI/min. > 0.04 UI/min causa isquemia cardíaca' 
     },
+    epinefrina: {
+    diluicoes: [
+        { amp: '1ml/100ml SG 5% (10mcg/ml)', concentracao: 0.01 },   // 10 mcg/ml = 0.01 mg/ml
+        { amp: '1ml/250ml SG 5% (4mcg/ml)', concentracao: 0.004 },  // 4 mcg/ml  = 0.004 mg/ml
+        { amp: '5ml/250ml SG 5% (20mcg/ml)', concentracao: 0.02 }    // 20 mcg/ml = 0.02 mg/ml
+    ],
+    unidadeDose: 'mcg/kg/min',
+    perKg: true,
+    perMin: true,
+    doseMin: 0.05,
+    doseMax: 2,
+    aviso: ''
+},
     midazolam: { 
         diluicoes: [
             { amp: '3 amp 50mg/220ml', concentracao: 0.6, calculoEspecial: (peso, dose) => peso * dose / 0.6 },
