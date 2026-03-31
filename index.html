@@ -58,7 +58,7 @@ form {
 
 form label {
     font-weight: 500;
-    color: var(--text-primary);
+    color: #000000;
     display: block;
     margin-bottom: 5px;
     font-size: 15px;
@@ -495,6 +495,8 @@ const medicamentosConfig = {
         aviso: 'Dose inicial: 0.1 a 0.2 mg/kg bolus (ou 15mg bolus)' 
     }
 };
+
+document.title = "Calculadora de Diluição";
 
 document.getElementById('medicamento').addEventListener('change', updateDoseInfo);
 
