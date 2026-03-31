@@ -496,7 +496,15 @@
 
 let hasCalculated = false;
 let modoCalculo = "dose";
+let memoriaDose = {
+    valor: '',
+    resultado: ''
+};
 
+let memoriaTaxa = {
+    valor: '',
+    resultado: ''
+};
 let lastValidPeso = '';
 let lastValidDose = '';
 
@@ -600,8 +608,10 @@ if (config.diluicoes.length === 1) {
         document.getElementById('peso').value = '';
     }
 
+if (!hasCalculated) {
     document.getElementById('dose').value = '';
     resetResultado();
+}
     updateButtonState();
 }
 
@@ -612,49 +622,51 @@ function updateButtonState() {
 
     const peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
     const dose = parseFloat(document.getElementById('dose').value.replace(',', '.'));
-    const dilutionIndex = document.getElementById('dilution').value;
+
+    const dilutionIndex = parseInt(document.getElementById('dilution').value);
+
+    if (isNaN(dilutionIndex)) return;
 
     const isPesoValid = !config.perKg || (!isNaN(peso) && peso > 0 && peso <= 650);
-   let isDoseValid;
 
-if (modoCalculo === "dose") {
+    let isDoseValid;
 
-    isDoseValid = !isNaN(dose) && dose > 0 && dose >= config.doseMin && dose <= config.doseMax;
+    if (modoCalculo === "dose") {
 
-} else {
+        isDoseValid = !isNaN(dose) && dose > 0 && dose >= config.doseMin && dose <= config.doseMax;
 
-    if (isNaN(dose) || dose <= 0) {
-        isDoseValid = false;
     } else {
 
-        // cálculo da taxa mínima e máxima
-        const dil = config.diluicoes[dilutionIndex];
-
-        if (!dil) {
+        if (isNaN(dose) || dose <= 0) {
             isDoseValid = false;
         } else {
 
-            let pesoVal = config.perKg ? peso : 1;
+            const dil = config.diluicoes[dilutionIndex];
 
-            let fatorTempo = config.perMin ? 60 : 1;
+            if (!dil) {
+                isDoseValid = false;
+            } else {
 
-            // dose → mg/h
-            const doseMinMgH = (config.unidadeDose.startsWith('mcg')
-                ? config.doseMin / 1000
-                : config.doseMin) * pesoVal * fatorTempo;
+                let pesoVal = config.perKg ? peso : 1;
+                let fatorTempo = config.perMin ? 60 : 1;
 
-            const doseMaxMgH = (config.unidadeDose.startsWith('mcg')
-                ? config.doseMax / 1000
-                : config.doseMax) * pesoVal * fatorTempo;
+                const doseMinMgH = (config.unidadeDose.startsWith('mcg')
+                    ? config.doseMin / 1000
+                    : config.doseMin) * pesoVal * fatorTempo;
 
-            const taxaMin = doseMinMgH / dil.concentracao;
-            const taxaMax = doseMaxMgH / dil.concentracao;
+                const doseMaxMgH = (config.unidadeDose.startsWith('mcg')
+                    ? config.doseMax / 1000
+                    : config.doseMax) * pesoVal * fatorTempo;
 
-            isDoseValid = dose >= taxaMin && dose <= taxaMax;
+                const taxaMin = doseMinMgH / dil.concentracao;
+                const taxaMax = doseMaxMgH / dil.concentracao;
+
+                isDoseValid = dose >= taxaMin && dose <= taxaMax;
+            }
         }
     }
-}
-    const isDilutionValid = dilutionIndex !== '';
+
+    const isDilutionValid = !isNaN(dilutionIndex);
 
     document.querySelector('button[type="submit"]').disabled =
         !(isPesoValid && isDoseValid && isDilutionValid);
@@ -667,8 +679,11 @@ function calcularTaxaInfusao() {
     const dilutionIndex = parseInt(document.getElementById('dilution').value);
 
     const resultadoDiv = document.getElementById('resultado');
+
+if (!hasCalculated) {
     resultadoDiv.innerHTML = '';
     resultadoDiv.classList.remove('erro');
+}
 
     const config = medicamentosConfig[medicamento];
     const dil = config.diluicoes[dilutionIndex];
@@ -736,8 +751,17 @@ function calcularTaxaInfusao() {
         }
     }
 
-    hasCalculated = true;
-    return true;
+hasCalculated = true;
+
+if (modoCalculo === "dose") {
+    memoriaDose.valor = document.getElementById('dose').value;
+    memoriaDose.resultado = resultadoDiv.innerHTML;
+} else {
+    memoriaTaxa.valor = document.getElementById('dose').value;
+    memoriaTaxa.resultado = resultadoDiv.innerHTML;
+}
+
+return true;
 }
 
 function mostrarErro(element, mensagem) {
@@ -747,22 +771,41 @@ function mostrarErro(element, mensagem) {
 
 /* EVENTOS */
 
-document.getElementById('medicamento').addEventListener('change', updateDoseInfo);
+document.getElementById('medicamento').addEventListener('change', () => {
+    memoriaDose = { valor: '', resultado: '' };
+    memoriaTaxa = { valor: '', resultado: '' };
+    hasCalculated = false;
+    updateDoseInfo();
+});
 
 document.getElementById('dilution').addEventListener('change', () => {
     updateButtonState();
-    if (hasCalculated) calcularTaxaInfusao();
+
+    if (hasCalculated) {
+        calcularTaxaInfusao();
+
+        // salva de novo após recalcular
+        if (modoCalculo === "dose") {
+            memoriaDose.resultado = document.getElementById('resultado').innerHTML;
+        } else {
+            memoriaTaxa.resultado = document.getElementById('resultado').innerHTML;
+        }
+    }
 });
 
 document.getElementById('peso').addEventListener('input', function() {
     validatePesoInput(this);
+
+    memoriaDose = { valor: '', resultado: '' };
+    memoriaTaxa = { valor: '', resultado: '' };
+
     resetResultado();
     updateButtonState();
 });
 
 document.getElementById('dose').addEventListener('input', function() {
     validateDoseInput(this);
-    resetResultado();
+
     updateButtonState();
 });
 
@@ -773,11 +816,35 @@ document.getElementById('calcForm').addEventListener('submit', function(e) {
 
 function atualizarModo() {
     const doseInput = document.getElementById("dose");
+    const resultadoDiv = document.getElementById("resultado");
 
-    doseInput.value = "";
+    if (modoCalculo === "dose") {
+        doseInput.value = memoriaDose.valor;
 
-    resetResultado();
-    updateDoseInfo();
+        if (memoriaDose.resultado) {
+            resultadoDiv.innerHTML = memoriaDose.resultado;
+            resultadoDiv.classList.remove("erro");
+        } else {
+            resultadoDiv.innerHTML = '';
+        }
+
+    } else {
+        doseInput.value = memoriaTaxa.valor;
+
+        if (memoriaTaxa.resultado) {
+            resultadoDiv.innerHTML = memoriaTaxa.resultado;
+            resultadoDiv.classList.remove("erro");
+        } else {
+            resultadoDiv.innerHTML = '';
+        }
+    }
+
+    const medicamento = document.getElementById('medicamento').value;
+    const config = medicamentosConfig[medicamento];
+
+    document.getElementById('doseUnit').textContent =
+        modoCalculo === "dose" ? config.unidadeDose : "ml/h";
+
     updateButtonState();
 }
 
