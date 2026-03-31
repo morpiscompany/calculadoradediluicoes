@@ -600,13 +600,17 @@ if (config.diluicoes.length === 1) {
     labelDilution.textContent = "Selecione a Diluição:";
 }
 
-    const pesoContainer = document.getElementById('pesoContainer');
-    if (config.perKg) {
-        pesoContainer.style.display = 'block';
-    } else {
-        pesoContainer.style.display = 'none';
-        document.getElementById('peso').value = '';
-    }
+const pesoContainer = document.getElementById('pesoContainer');
+const pesoInput = document.getElementById('peso');
+
+if (config.perKg) {
+    pesoContainer.style.display = 'block';
+    pesoInput.required = true;
+} else {
+    pesoContainer.style.display = 'none';
+    pesoInput.value = '';
+    pesoInput.required = false;
+}
 
 if (!hasCalculated) {
     document.getElementById('dose').value = '';
@@ -620,52 +624,14 @@ function updateButtonState() {
     const config = medicamentosConfig[medicamento];
     if (!config) return;
 
-    const peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
-    const dose = parseFloat(document.getElementById('dose').value.replace(',', '.'));
+    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
+    if (!config.perKg) peso = 1;
 
+    const dose = parseFloat(document.getElementById('dose').value.replace(',', '.'));
     const dilutionIndex = parseInt(document.getElementById('dilution').value);
 
-    if (isNaN(dilutionIndex)) return;
-
     const isPesoValid = !config.perKg || (!isNaN(peso) && peso > 0 && peso <= 650);
-
-    let isDoseValid;
-
-    if (modoCalculo === "dose") {
-
-        isDoseValid = !isNaN(dose) && dose > 0 && dose >= config.doseMin && dose <= config.doseMax;
-
-    } else {
-
-        if (isNaN(dose) || dose <= 0) {
-            isDoseValid = false;
-        } else {
-
-            const dil = config.diluicoes[dilutionIndex];
-
-            if (!dil) {
-                isDoseValid = false;
-            } else {
-
-                let pesoVal = config.perKg ? peso : 1;
-                let fatorTempo = config.perMin ? 60 : 1;
-
-                const doseMinMgH = (config.unidadeDose.startsWith('mcg')
-                    ? config.doseMin / 1000
-                    : config.doseMin) * pesoVal * fatorTempo;
-
-                const doseMaxMgH = (config.unidadeDose.startsWith('mcg')
-                    ? config.doseMax / 1000
-                    : config.doseMax) * pesoVal * fatorTempo;
-
-                const taxaMin = doseMinMgH / dil.concentracao;
-                const taxaMax = doseMaxMgH / dil.concentracao;
-
-                isDoseValid = dose >= taxaMin && dose <= taxaMax;
-            }
-        }
-    }
-
+    const isDoseValid = !isNaN(dose) && dose > 0;
     const isDilutionValid = !isNaN(dilutionIndex);
 
     document.querySelector('button[type="submit"]').disabled =
@@ -673,8 +639,11 @@ function updateButtonState() {
 }
 
 function calcularTaxaInfusao() {
-    const peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
     const medicamento = document.getElementById('medicamento').value;
+    const config = medicamentosConfig[medicamento];
+
+    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
+    if (!config.perKg) peso = 1;
     const dose = parseFloat(document.getElementById('dose').value.replace(',', '.'));
     const dilutionIndex = parseInt(document.getElementById('dilution').value);
 
@@ -684,8 +653,6 @@ if (!hasCalculated) {
     resultadoDiv.innerHTML = '';
     resultadoDiv.classList.remove('erro');
 }
-
-    const config = medicamentosConfig[medicamento];
     const dil = config.diluicoes[dilutionIndex];
 
     if (!dil) {
@@ -710,7 +677,8 @@ if (!hasCalculated) {
     }
 }
 
-    const isMcg = config.unidadeDose.startsWith('mcg');
+   const isMcg = config.unidadeDose.startsWith('mcg');
+   const isUI = config.unidadeDose.startsWith('UI');
     let taxaMlH = 0;
     let doseCalculada = 0;
 
@@ -719,8 +687,16 @@ if (!hasCalculated) {
         if (config.perKg) dosePorHora *= peso;
         if (config.perMin) dosePorHora *= 60;
 
-        const doseMgPorHora = isMcg ? dosePorHora / 1000 : dosePorHora;
-        taxaMlH = doseMgPorHora / dil.concentracao;
+       let doseConvertida;
+
+if (isMcg) {
+    doseConvertida = dosePorHora / 1000; // mcg → mg
+} else if (isUI) {
+    doseConvertida = dosePorHora; // UI → mantém
+} else {
+    doseConvertida = dosePorHora; // mg
+}
+        taxaMlH = doseConvertida / dil.concentracao;
 
         taxaMlH = parseFloat(taxaMlH.toFixed(2));
         resultadoDiv.innerHTML = `<strong>Taxa de infusão:</strong> ${taxaMlH} ml/h`;
@@ -728,12 +704,23 @@ if (!hasCalculated) {
     } else {
         taxaMlH = dose;
 
-        let doseMgPorHora = taxaMlH * dil.concentracao;
-        if (config.perMin) doseMgPorHora /= 60;
-        if (config.perKg) doseMgPorHora /= peso;
+let doseBase = taxaMlH * dil.concentracao;
 
-        doseCalculada = isMcg ? doseMgPorHora * 1000 : doseMgPorHora;
-        doseCalculada = parseFloat(doseCalculada.toFixed(3));
+// ajusta tempo
+if (config.perMin) doseBase /= 60;
+
+// ajusta peso
+if (config.perKg) doseBase /= peso;
+
+// converte unidade
+if (isMcg) {
+    doseCalculada = doseBase * 1000; // mg → mcg
+} else if (isUI) {
+    doseCalculada = doseBase; // UI → mantém
+} else {
+    doseCalculada = doseBase; // mg → mantém
+}
+        doseCalculada = parseFloat(doseCalculada.toFixed(2));
 
         if (doseCalculada < config.doseMin || doseCalculada > config.doseMax) {
             resultadoDiv.innerHTML = `
