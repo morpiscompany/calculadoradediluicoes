@@ -170,9 +170,12 @@
         .aviso-text {
             line-height: 1.4;
         }
-        .aviso-item {
-            margin: 0 0 4px 0;
-        }
+       .aviso-item {
+    margin: 0 0 6px 0;
+    padding-left: 14px;
+    text-indent: -9px;
+    line-height: 1.4;
+}
         .resultado.erro {
             background-color: var(--warning-bg);
             color: var(--warning-text);
@@ -243,6 +246,8 @@
         @media (max-width: 500px) {
             .toggle-btn { padding: 11px 24px; min-width: 145px; font-size: 14.8px; }
         }
+
+        
     </style>
 </head>
 <body>
@@ -285,7 +290,7 @@
             </div>
 
             <div class="campo">
-                <label for="dilution">Selecione a Diluição:</label>
+               <label for="dilution" id="labelDilution">Selecione a Diluição:</label>
                 <select id="dilution" required></select>
             </div>
 
@@ -575,11 +580,17 @@ function updateDoseInfo() {
         dilutionSelect.appendChild(option);
     });
 
-    if (config.diluicoes.length === 1) {
-        dilutionSelect.classList.add('single-option');
-    } else {
-        dilutionSelect.classList.remove('single-option');
-    }
+const labelDilution = document.getElementById('labelDilution');
+
+if (config.diluicoes.length === 1) {
+    dilutionSelect.classList.add('single-option');
+    dilutionSelect.disabled = true; // 🔒 trava o select
+    labelDilution.textContent = "Diluição:";
+} else {
+    dilutionSelect.classList.remove('single-option');
+    dilutionSelect.disabled = false; // 🔓 libera o select
+    labelDilution.textContent = "Selecione a Diluição:";
+}
 
     const pesoContainer = document.getElementById('pesoContainer');
     if (config.perKg) {
