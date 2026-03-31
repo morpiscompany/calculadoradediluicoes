@@ -781,16 +781,37 @@ document.getElementById('medicamento').addEventListener('change', () => {
 document.getElementById('dilution').addEventListener('change', () => {
     updateButtonState();
 
-    if (hasCalculated) {
-        calcularTaxaInfusao();
+    if (!hasCalculated) return;
 
-        // salva de novo após recalcular
-        if (modoCalculo === "dose") {
-            memoriaDose.resultado = document.getElementById('resultado').innerHTML;
-        } else {
-            memoriaTaxa.resultado = document.getElementById('resultado').innerHTML;
-        }
+    const resultadoDiv = document.getElementById('resultado');
+    const doseInput = document.getElementById('dose');
+
+    // salva modo atual
+    const modoAtual = modoCalculo;
+
+    // RECALCULA MODO DOSE
+    modoCalculo = "dose";
+    doseInput.value = memoriaDose.valor;
+
+    if (memoriaDose.valor) {
+        calcularTaxaInfusao();
+        memoriaDose.resultado = resultadoDiv.innerHTML;
     }
+
+    // RECALCULA MODO TAXA
+    modoCalculo = "taxa";
+    doseInput.value = memoriaTaxa.valor;
+
+    if (memoriaTaxa.valor) {
+        calcularTaxaInfusao();
+        memoriaTaxa.resultado = resultadoDiv.innerHTML;
+    }
+
+    // 🔁 volta pro modo original
+    modoCalculo = modoAtual;
+
+    // 🔁 restaura UI corretamente
+    atualizarModo();
 });
 
 document.getElementById('peso').addEventListener('input', function() {
