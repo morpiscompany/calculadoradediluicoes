@@ -91,9 +91,17 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
         }
-        input.invalid {
-            border-color: var(--error);
-        }
+       input.invalid {
+    border-color: var(--error) !important;
+    box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.3) !important;
+    animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%  { transform: translateX(-6px); }
+    75%  { transform: translateX(6px); }
+}
         #doseRange {
             color: var(--text-secondary);
             font-size: 12px;
@@ -123,7 +131,7 @@
         }
         button:disabled {
             background-color: #cccccc;
-            cursor: not-allowed;
+            cursor: default;
             box-shadow: none;
         }
         button:hover:not(:disabled) {
@@ -131,12 +139,22 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .resultado {
-            margin-top: 24px;
-            padding: 16px;
-            border-radius: 5px;
+            margin-top: 15px;
+
+            width: 100%;
+            box-sizing: border-box;
+
+            padding: 12px 15px;
+
+            border-radius: 4px;
+            border: 1px solid #ccc;
+
             background-color: var(--surface);
             color: var(--text-primary);
-            font-size: 16px;
+
+            font-size: 15px;
+            text-align: center;
+
             box-shadow: var(--shadow);
             transition: transform 0.2s ease;
         }
@@ -183,11 +201,20 @@
             text-align: left;
         }
         .resultado.erro .aviso-icon {
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--error);
+
+            width: 18px;
+            height: 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
             line-height: 1;
-            transform: translateY(4px);
             flex-shrink: 0;
-        }
+}
         @media (max-width: 500px) {
             .container { margin: 16px; padding: 16px; }
             h1 { font-size: 20px; }
@@ -246,7 +273,6 @@
         @media (max-width: 500px) {
             .toggle-btn { padding: 11px 24px; min-width: 145px; font-size: 14.8px; }
         }
-
         
     </style>
 </head>
@@ -495,67 +521,348 @@
         };
 
 let hasCalculated = false;
-let modoCalculo = "dose";
-let memoriaDose = {
-    valor: '',
-    resultado: ''
-};
-
-let memoriaTaxa = {
-    valor: '',
-    resultado: ''
-};
+let resultadoValido = false;
 let lastValidPeso = '';
 let lastValidDose = '';
+let lastValidTaxa = '';
+let pesoAnterior = '';
+let pesoConfirmado = false;
+let timeoutAvisoDose = null;
+
+
+const state = {
+    modo: "dose",
+    peso: null,
+    medicamento: null,
+    diluicao: null,
+
+    dose: {
+        valor: '',
+        resultado: null
+    },
+
+    taxa: {
+        valor: '',
+        resultado: null
+    },
+
+    memoria: {
+        dose: {
+            valor: '',
+            resultado: null
+        },
+        taxa: {
+            valor: '',
+            resultado: null
+        }
+}
+};
 
 function resetResultado() {
     const resultado = document.getElementById('resultado');
     resultado.innerHTML = '';
-    resultado.classList.remove('erro');
+    resultado.classList.remove('erro', 'alerta');
     hasCalculated = false;
+    resultadoValido = false;
+}
+
+function renderizarResultado(valorFormatado, tipo, unidadeTexto) {
+    const resultadoDiv = document.getElementById('resultado');
+
+    // 1. LIMPA tudo
+    resultadoDiv.classList.remove('erro', 'alerta');
+
+    // 2. TEXTO
+    resultadoDiv.innerHTML = `<strong>${unidadeTexto}:</strong> ${valorFormatado}`;
+
+    // 3. ESTILO
+    if (tipo === "erro") {
+        resultadoDiv.classList.add('erro');
+    }
+}
+
+function resetarDadosPorMudancaDePeso() {
+    const doseInput = document.getElementById('dose');
+    const resultadoDiv = document.getElementById('resultado');
+
+    // Limpa input principal
+    doseInput.value = '';
+
+    // Limpa estados de validação
+    lastValidDose = '';
+    if (typeof lastValidTaxa !== 'undefined') {
+        lastValidTaxa = '';
+    }
+
+    // Limpa memória dos modos
+    state.memoria.dose = { valor: '', resultado: '' };
+    state.memoria.taxa = { valor: '', resultado: '' };
+
+    // Reseta resultado visual
+    resultadoDiv.innerHTML = '';
+    resultadoDiv.classList.remove('erro', 'alerta');
+
+    // Reseta flags de controle
+    hasCalculated = false;
+    resultadoValido = false;
+
+    updateButtonState();
 }
 
 function validatePesoInput(input) {
     let value = input.value.replace(/\./g, ',');
+    
     if (!value) {
         lastValidPeso = '';
         input.value = '';
+        input.classList.remove('invalid');   // limpa erro se apagar
         return;
     }
+
+    // Impede vírgula inválida ou múltiplas vírgulas
     if (/^,/.test(value) || (value.match(/,/g) || []).length > 1) {
+        mostrarErroNoCampo(input);
         input.value = lastValidPeso;
         return;
     }
+
+    // Permite apenas números e no máximo uma vírgula (até 3 casas decimais)
     if (!/^[0-9]{0,3}(,[0-9]{0,3})?$/.test(value)) {
+        mostrarErroNoCampo(input);
         input.value = lastValidPeso;
         return;
     }
+
     const num = parseFloat(value.replace(',', '.'));
+
+    // === BLOQUEADOR DE PESO MÁXIMO 650 KG ===
     if (!isNaN(num) && num > 650) {
-        input.value = lastValidPeso;
+        mostrarErroNoCampo(input);
+        input.value = lastValidPeso;   // volta para o último valor válido
         return;
     }
+
+    // Se chegou aqui, o valor é válido
+    input.classList.remove('invalid');
     input.value = value;
     lastValidPeso = value;
 }
 
 function validateDoseInput(input) {
     let value = input.value.replace(/\./g, ',');
+    const medicamento = document.getElementById('medicamento').value;
+    const config = medicamentosConfig[medicamento];
+
     if (!value) {
         lastValidDose = '';
         input.value = '';
+        input.classList.remove('invalid');
         return;
     }
+
+    // impede vírgula inválida
     if (/^,/.test(value) || (value.match(/,/g) || []).length > 1) {
+        mostrarErroNoCampo(input);
         input.value = lastValidDose;
         return;
     }
-    if (!/^[0-9]{0,3}(,[0-9]{0,3})?$/.test(value)) {
+
+    // padrão numérico
+    if (!/^[0-9]{0,6}(,[0-9]*)?$/.test(value)) {
+        mostrarErroNoCampo(input);
         input.value = lastValidDose;
         return;
     }
+
+    // LIMITA PARA 2 CASAS DECIMAIS
+    if (value.includes(',')) {
+        const partes = value.split(',');
+        if (partes[1].length > 2) {
+            mostrarErroNoCampo(input);
+            input.value = lastValidDose;
+            return;
+        }
+    }
+
+    const num = parseFloat(value.replace(',', '.'));
+
+    if (isNaN(num)) {
+        input.value = lastValidDose;
+        return;
+    }
+
+    // === BLOQUEIO DO RANGE ===
+    if (config) {
+        if (num > config.doseMax) {
+            mostrarErroNoCampo(input, `Máximo: ${config.doseMax}`);
+            input.value = lastValidDose;
+            return;
+        }
+        
+    }
+
+    // Se chegou aqui, o valor é válido
+    input.classList.remove('invalid');
     input.value = value;
     lastValidDose = value;
+}
+
+// função para feedback visual de erro
+function mostrarErroNoCampo(input, mensagem = '') {
+    input.classList.add('invalid');
+    
+    // Remove a classe depois de 1 segundo
+    setTimeout(() => {
+        input.classList.remove('invalid');
+    }, 800);
+
+    // mostrar mensagem temporária
+    if (mensagem) {
+        const small = document.getElementById('doseUnit');
+        
+        if (timeoutAvisoDose) {
+        clearTimeout(timeoutAvisoDose);
+    }
+        
+        const medicamento = document.getElementById('medicamento').value;
+        const config = medicamentosConfig[medicamento];
+
+const originalText = state.modo === "dose"
+    ? config.unidadeDose
+    : "ml/h";
+        
+        small.style.color = 'var(--error)';
+        small.textContent = mensagem;
+
+timeoutAvisoDose = setTimeout(() => {
+    small.style.color = '';
+    small.textContent = originalText;
+    timeoutAvisoDose = null;
+ }, 1500);
+    }
+}
+
+function mostrarAlerta(element, mensagem) {
+    element.innerHTML = `
+        <div class="aviso-inner">
+            <span class="aviso-icon">⚠</span>
+            <div class="aviso-text">${mensagem}</div>
+        </div>
+    `;
+    element.classList.remove('erro');
+}
+
+function renderizarAlerta(valorCalculado, taxaMin, taxaMax, unidadeDose) {
+    const resultadoDiv = document.getElementById('resultado');
+
+    resultadoDiv.classList.remove('alerta');
+    resultadoDiv.classList.add('erro');
+
+    resultadoDiv.innerHTML = `
+        <div class="aviso-inner" style="text-align: left;">
+            
+            <span class="aviso-icon aviso-icon-triangulo">⚠</span>
+
+            <div class="aviso-text">
+                <div class="aviso-item">
+                    • Dose calculada: ${valorCalculado} ${unidadeDose}
+                </div>
+
+                <div class="aviso-item">
+                    • Situação: fora da faixa recomendada
+                </div>
+
+                <div class="aviso-item">
+                    • Taxa de infusão recomendada: ${taxaMin} - ${taxaMax} ml/h
+                </div>
+            </div>
+
+        </div>
+    `;
+}
+
+function sincronizarCalculos() {
+    const medicamento = document.getElementById('medicamento').value;
+    const config = medicamentosConfig[medicamento];
+
+    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
+    if (!config.perKg) peso = 1;
+
+    const dilutionIndex = parseInt(document.getElementById('dilution').value);
+    const dil = config.diluicoes[dilutionIndex];
+
+    if (!dil || (config.perKg && (!peso || peso <= 0))) return;
+
+    // DOSE → TAXA
+    if (state.dose.valor) {
+        const dose = parseFloat(state.dose.valor.replace(',', '.'));
+        if (!isNaN(dose) && dose > 0) {
+            state.taxa.resultado = calcularTaxa(dose);
+        }
+    }
+
+    // TAXA → DOSE
+    if (state.taxa.valor) {
+        const taxa = parseFloat(state.taxa.valor.replace(',', '.'));
+        if (!isNaN(taxa) && taxa > 0) {
+
+            let doseBase = taxa * dil.concentracao;
+
+            if (config.perMin) doseBase /= 60;
+            if (config.perKg) doseBase /= peso;
+
+            const isMcg = config.unidadeDose.startsWith('mcg');
+            let doseFinal = isMcg ? doseBase * 1000 : doseBase;
+
+            state.dose.resultado = parseFloat(doseFinal.toFixed(2));
+        }
+    }
+}
+
+function validarTaxaInfusao(input) {
+    let value = input.value.replace(/\./g, ',');
+
+    if (!value) {
+        lastValidTaxa = '';
+        input.value = '';
+        return;
+    }
+
+    if (/^,/.test(value) || (value.match(/,/g) || []).length > 1) {
+        input.value = lastValidTaxa;
+        return;
+    }
+
+    if (!/^[0-9]{0,3}(,[0-9]{0,2})?$/.test(value)) {
+        input.value = lastValidTaxa;
+        return;
+    }
+
+    const num = parseFloat(value.replace(',', '.'));
+
+    if (isNaN(num)) {
+        input.value = lastValidTaxa;
+        return;
+    }
+
+    // LIMITE TÉCNICO DA TAXA
+    if (num > 999) {
+        input.value = lastValidTaxa;
+        return;
+    }
+
+    input.value = value;
+    lastValidTaxa = value;
+}
+
+function atualizarEstiloResultado(valor, config, resultadoDiv) {
+    if (!config) return;
+
+    resultadoDiv.classList.remove('erro', 'alerta');
+
+    if (valor < config.doseMin || valor > config.doseMax) {
+        resultadoDiv.classList.add('erro'); // vermelho
+    }
 }
 
 function updateDoseInfo() {
@@ -564,7 +871,7 @@ function updateDoseInfo() {
     if (!config) return;
 
     document.getElementById('doseUnit').textContent =
-        modoCalculo === "dose" ? config.unidadeDose : "ml/h";
+    state.modo === "dose" ? config.unidadeDose : "ml/h";
 
     document.getElementById('doseRange').textContent =
         `Dose recomendada: ${config.doseMin} - ${config.doseMax} ${config.unidadeDose}`;
@@ -592,11 +899,11 @@ const labelDilution = document.getElementById('labelDilution');
 
 if (config.diluicoes.length === 1) {
     dilutionSelect.classList.add('single-option');
-    dilutionSelect.disabled = true; // 🔒 trava o select
+    dilutionSelect.disabled = true; // trava o select
     labelDilution.textContent = "Diluição:";
 } else {
     dilutionSelect.classList.remove('single-option');
-    dilutionSelect.disabled = false; // 🔓 libera o select
+    dilutionSelect.disabled = false; // libera o select
     labelDilution.textContent = "Selecione a Diluição:";
 }
 
@@ -638,6 +945,55 @@ function updateButtonState() {
         !(isPesoValid && isDoseValid && isDilutionValid);
 }
 
+function calcularTaxa(dose) {
+    const medicamento = document.getElementById('medicamento').value;
+    const config = medicamentosConfig[medicamento];
+
+    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
+    if (!config.perKg) peso = 1;
+
+    const dilutionIndex = parseInt(document.getElementById('dilution').value);
+    const dil = config.diluicoes[dilutionIndex];
+
+    const isMcg = config.unidadeDose.startsWith('mcg');
+    const isUI = config.unidadeDose.startsWith('UI');
+
+    let dosePorHora = dose;
+
+    if (config.perKg) dosePorHora *= peso;
+    if (config.perMin) dosePorHora *= 60;
+
+    let doseConvertida;
+
+    if (isMcg) doseConvertida = dosePorHora / 1000;
+    else doseConvertida = dosePorHora;
+
+    let taxa = doseConvertida / dil.concentracao;
+
+    return parseFloat(taxa.toFixed(2));
+}
+
+function recalcularSePossivel() {
+    const medicamento = document.getElementById('medicamento').value;
+    const config = medicamentosConfig[medicamento];
+
+    const doseInput = document.getElementById('dose').value;
+    const pesoInput = document.getElementById('peso').value;
+    const dilution = document.getElementById('dilution').value;
+
+    if (!doseInput || dilution === '') return;
+
+    if (config.perKg) {
+        const peso = parseFloat(pesoInput.replace(',', '.'));
+        if (isNaN(peso) || peso <= 0) return;
+    }
+
+    const valor = parseFloat(doseInput.replace(',', '.'));
+    if (isNaN(valor) || valor <= 0) return;
+
+    calcularTaxaInfusao();
+}
+
 function calcularTaxaInfusao() {
     const medicamento = document.getElementById('medicamento').value;
     const config = medicamentosConfig[medicamento];
@@ -670,7 +1026,7 @@ if (!hasCalculated) {
         return false;
     }
 
-  if (modoCalculo === "dose") {
+  if (state.modo === "dose") {
     if (dose < config.doseMin || dose > config.doseMax) {
         mostrarErro(resultadoDiv, `Dose fora do range (${config.doseMin} - ${config.doseMax} ${config.unidadeDose})`);
         return false;
@@ -682,7 +1038,7 @@ if (!hasCalculated) {
     let taxaMlH = 0;
     let doseCalculada = 0;
 
-    if (modoCalculo === "dose") {
+    if (state.modo === "dose") {
         let dosePorHora = dose;
         if (config.perKg) dosePorHora *= peso;
         if (config.perMin) dosePorHora *= 60;
@@ -696,10 +1052,56 @@ if (isMcg) {
 } else {
     doseConvertida = dosePorHora; // mg
 }
-        taxaMlH = doseConvertida / dil.concentracao;
+       if (dil.calculoEspecial) {
+    taxaMlH = dil.calculoEspecial(peso, dose);
+} else {
+    taxaMlH = doseConvertida / dil.concentracao;
+}
 
         taxaMlH = parseFloat(taxaMlH.toFixed(2));
-        resultadoDiv.innerHTML = `<strong>Taxa de infusão:</strong> ${taxaMlH} ml/h`;
+
+        if (false) {
+
+    let taxaMin = calcularTaxa(config.doseMin);
+    let taxaMax = calcularTaxa(config.doseMax);
+
+    renderizarAlerta(
+        taxaMlH,
+        taxaMin,
+        taxaMax,
+        config.unidadeDose
+    );
+
+    //SALVA ALERTA
+    state.memoria.dose.resultado = {
+        tipo: "alerta",
+        valor: taxaMlH,
+        taxaMin: taxaMin,
+        taxaMax: taxaMax
+    };
+
+} else {
+
+    renderizarResultado(
+        `${taxaMlH} ml/h`,
+        "normal",
+        "Taxa de infusão"
+    );
+
+    //SALVA NORMAL
+   if (dose >= config.doseMin && dose <= config.doseMax) {
+   
+    state.memoria.dose.valor = document.getElementById('dose').value;
+
+    state.memoria.dose.resultado = {
+        tipo: "normal",
+        valor: taxaMlH
+    };
+} else {
+    // NÃO SALVA ALERTA
+    state.memoria.dose = { valor: '', resultado: null };
+}
+}
 
     } else {
         taxaMlH = dose;
@@ -722,97 +1124,165 @@ if (isMcg) {
 }
         doseCalculada = parseFloat(doseCalculada.toFixed(2));
 
-        if (doseCalculada < config.doseMin || doseCalculada > config.doseMax) {
-            resultadoDiv.innerHTML = `
-                <div class="aviso-inner">
-                    <span class="aviso-icon">⚠</span>
-                    <div class="aviso-text">
-                        <strong>Dose calculada:</strong> ${doseCalculada} ${config.unidadeDose}<br>
-                        <strong>Fora do intervalo seguro!</strong>
-                    </div>
-                </div>
-            `;
-            resultadoDiv.classList.add("erro");
-        } else {
-            resultadoDiv.innerHTML = `<strong>Dose:</strong> ${doseCalculada} ${config.unidadeDose}`;
-        }
+if (doseCalculada < config.doseMin || doseCalculada > config.doseMax) {
+
+    let taxaMin = calcularTaxa(config.doseMin);
+    let taxaMax = calcularTaxa(config.doseMax);
+
+    renderizarAlerta(
+        doseCalculada,
+        taxaMin,
+        taxaMax,
+        config.unidadeDose
+    );
+} else {
+    renderizarResultado(
+        `${doseCalculada} ${config.unidadeDose}`,
+        "normal",
+        "Dose"
+    );
+}
+
+// salva estado correto
+if (doseCalculada >= config.doseMin && doseCalculada <= config.doseMax) {
+    
+    state.memoria.taxa.valor = document.getElementById('dose').value;
+
+    state.memoria.taxa.resultado = {
+        tipo: "normal",
+        valor: doseCalculada
+    };
+} else {
+    // NÃO SALVA ALERTA
+    state.memoria.taxa = { valor: '', resultado: null };
+}
     }
 
 hasCalculated = true;
+resultadoValido = true;
 
-if (modoCalculo === "dose") {
-    memoriaDose.valor = document.getElementById('dose').value;
-    memoriaDose.resultado = resultadoDiv.innerHTML;
-} else {
-    memoriaTaxa.valor = document.getElementById('dose').value;
-    memoriaTaxa.resultado = resultadoDiv.innerHTML;
+if (false) {
+
+}
+// MARCA PESO COMO CONFIRMADO
+const pesoInput = document.getElementById('peso').value;
+if (pesoInput) {
+    pesoAnterior = pesoInput;
+    pesoConfirmado = true;
 }
 
 return true;
 }
 
 function mostrarErro(element, mensagem) {
-    element.innerHTML = `<div class="aviso-inner"><span class="aviso-icon">⚠</span><div class="aviso-text">${mensagem}</div></div>`;
+    element.innerHTML = `
+        <div class="aviso-inner">
+            <span class="aviso-icon">⚠</span>
+            <div class="aviso-text">${mensagem}</div>
+        </div>
+    `;
+    element.classList.remove('alerta');
     element.classList.add('erro');
 }
 
 /* EVENTOS */
 
 document.getElementById('medicamento').addEventListener('change', () => {
-    memoriaDose = { valor: '', resultado: '' };
-    memoriaTaxa = { valor: '', resultado: '' };
+    state.memoria.dose = { valor: '', resultado: '' };
+    state.memoria.taxa = { valor: '', resultado: '' };
     hasCalculated = false;
+
     updateDoseInfo();
+    recalcularSePossivel();
+    sincronizarCalculos();
 });
 
 document.getElementById('dilution').addEventListener('change', () => {
     updateButtonState();
-
-    if (!hasCalculated) return;
-
-    const resultadoDiv = document.getElementById('resultado');
-    const doseInput = document.getElementById('dose');
-
-    // salva modo atual
-    const modoAtual = modoCalculo;
-
-    // RECALCULA MODO DOSE
-    modoCalculo = "dose";
-    doseInput.value = memoriaDose.valor;
-
-    if (memoriaDose.valor) {
-        calcularTaxaInfusao();
-        memoriaDose.resultado = resultadoDiv.innerHTML;
-    }
-
-    // RECALCULA MODO TAXA
-    modoCalculo = "taxa";
-    doseInput.value = memoriaTaxa.valor;
-
-    if (memoriaTaxa.valor) {
-        calcularTaxaInfusao();
-        memoriaTaxa.resultado = resultadoDiv.innerHTML;
-    }
-
-    // 🔁 volta pro modo original
-    modoCalculo = modoAtual;
-
-    // 🔁 restaura UI corretamente
-    atualizarModo();
+    recalcularSePossivel();
+    sincronizarCalculos();
 });
 
 document.getElementById('peso').addEventListener('input', function() {
     validatePesoInput(this);
+    sincronizarCalculos();
 
-    memoriaDose = { valor: '', resultado: '' };
-    memoriaTaxa = { valor: '', resultado: '' };
+    const pesoAtual = this.value;
 
-    resetResultado();
+    // CASO 1: CAMPO FOI APAGADO → RESET IMEDIATO
+    if (!pesoAtual) {
+        if (pesoConfirmado) {
+            resetarDadosPorMudancaDePeso();
+        }
+
+        pesoAnterior = '';
+        pesoConfirmado = false;
+        updateButtonState();
+        return;
+    }
+
+    // CASO 2: PRIMEIRA DIGITAÇÃO (AINDA NÃO CONFIRMADO)
+    if (!pesoConfirmado) {
+        // ainda está digitando → NÃO resetar
+        pesoAnterior = pesoAtual;
+        updateButtonState();
+        return;
+    }
+
+    // CASO 3: JÁ CONFIRMADO E VALOR MUDOU → RESET
+    if (pesoAtual !== pesoAnterior) {
+        resetarDadosPorMudancaDePeso();
+    }
+
+    // atualiza referência
+    pesoAnterior = pesoAtual;
+
     updateButtonState();
 });
 
+document.getElementById('peso').addEventListener('blur', function() {
+    const pesoAtual = this.value;
+
+    // se vazio → apenas limpa estado
+    if (!pesoAtual) {
+        pesoAnterior = '';
+        return;
+    }
+
+    // primeiro valor → só salva
+    if (!pesoAnterior) {
+        pesoAnterior = pesoAtual;
+        return;
+    }
+
+    // RESET
+    if (pesoAtual !== pesoAnterior) {
+        resetarDadosPorMudancaDePeso();
+    }
+
+    pesoAnterior = pesoAtual;
+});
+
 document.getElementById('dose').addEventListener('input', function() {
-    validateDoseInput(this);
+resetResultado();
+
+    if (state.modo === "dose") {
+        validateDoseInput(this);
+    } else {
+        validarTaxaInfusao(this);
+    }
+
+    // INVALIDA RESULTADO AO EDITAR
+    if (resultadoValido) {
+        resetResultado();
+
+        // limpa apenas o resultado do modo atual
+        if (state.modo === "dose") {
+            state.memoria.dose.resultado = '';
+        } else {
+            state.memoria.taxa.resultado = '';
+        }
+    }
 
     updateButtonState();
 });
@@ -825,33 +1295,84 @@ document.getElementById('calcForm').addEventListener('submit', function(e) {
 function atualizarModo() {
     const doseInput = document.getElementById("dose");
     const resultadoDiv = document.getElementById("resultado");
-
-    if (modoCalculo === "dose") {
-        doseInput.value = memoriaDose.valor;
-
-        if (memoriaDose.resultado) {
-            resultadoDiv.innerHTML = memoriaDose.resultado;
-            resultadoDiv.classList.remove("erro");
-        } else {
-            resultadoDiv.innerHTML = '';
-        }
-
-    } else {
-        doseInput.value = memoriaTaxa.valor;
-
-        if (memoriaTaxa.resultado) {
-            resultadoDiv.innerHTML = memoriaTaxa.resultado;
-            resultadoDiv.classList.remove("erro");
-        } else {
-            resultadoDiv.innerHTML = '';
-        }
-    }
-
     const medicamento = document.getElementById('medicamento').value;
     const config = medicamentosConfig[medicamento];
+    if (state.modo === "dose") {
+        doseInput.value = state.memoria.dose.valor;
+
+    if (state.memoria.dose.resultado) {
+        const resultado = state.memoria.dose.resultado;
+
+if (state.modo === "taxa") {
+    if (!state.taxa.valor || !state.taxa.resultado) {
+        doseInput.value = '';
+        resultadoDiv.innerHTML = '';
+        resultadoDiv.classList.remove('erro', 'alerta');
+        return;
+    }
+}
+
+if (resultado) {
+
+    if (resultado.tipo === "alerta") {
+
+        renderizarAlerta(
+            resultado.valor,
+            resultado.taxaMin,
+            resultado.taxaMax,
+            config.unidadeDose
+        );
+
+    } else {
+
+        renderizarResultado(
+            `${resultado.valor} ${
+                state.modo === "dose" ? "ml/h" : config.unidadeDose
+            }`,
+            "normal",
+            state.modo === "dose" ? "Taxa de infusão" : "Dose"
+        );
+
+    }
+
+} else {
+    resultadoDiv.innerHTML = '';
+}
+    
+        const texto = resultadoDiv.innerText;
+        const valor = parseFloat(texto.replace(',', '.').match(/[\d.]+/));
+
+} else {
+    resultadoDiv.innerHTML = '';
+}
+
+} else {
+    doseInput.value = state.memoria.taxa.valor;
+
+    if (state.memoria.taxa.resultado) {
+        const resultado = state.memoria.taxa.resultado;
+
+        const medicamento = document.getElementById('medicamento').value;
+        const config = medicamentosConfig[medicamento];
+
+    if (resultado) {
+        renderizarResultado(
+           `${resultado.valor} ${config.unidadeDose}`,
+           resultado.tipo,
+           "Dose"
+       );
+    }
+       
+        const texto = resultadoDiv.innerText;
+        const valor = parseFloat(texto.replace(',', '.').match(/[\d.]+/));
+   
+    } else {
+        resultadoDiv.innerHTML = '';
+    }
+}
 
     document.getElementById('doseUnit').textContent =
-        modoCalculo === "dose" ? config.unidadeDose : "ml/h";
+        state.modo === "dose" ? config.unidadeDose : "ml/h";
 
     updateButtonState();
 }
@@ -860,17 +1381,19 @@ const btnDose = document.getElementById("modoDose");
 const btnTaxa = document.getElementById("modoTaxa");
 
 btnDose.addEventListener("click", () => {
-    modoCalculo = "dose";
+    state.modo = "dose";
     btnDose.classList.add("ativo");
     btnTaxa.classList.remove("ativo");
     atualizarModo();
+    recalcularSePossivel();
 });
 
 btnTaxa.addEventListener("click", () => {
-    modoCalculo = "taxa";
+    state.modo = "taxa";
     btnTaxa.classList.add("ativo");
     btnDose.classList.remove("ativo");
     atualizarModo();
+    recalcularSePossivel();
 });
 
 updateDoseInfo();
