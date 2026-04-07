@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Diluição de Medicamentos</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         
         :root {
@@ -179,25 +180,14 @@
             align-items: flex-start;
             gap: 8px;
         }
-        .aviso-icon {
-            font-size: 18px;
-            line-height: 1;
-            transform: translateY(2px);
-            flex-shrink: 0;
-    
-            color: inherit;           /* herda a cor vermelha do aviso */
-            -webkit-text-fill-color: currentColor;  /* compatibilidade extra */
-    
-            text-shadow: 0 0 0 currentColor;
-        }
         .aviso-text {
             line-height: 1.4;
         }
         .aviso-item {
-            margin: 0 0 6px 0;
-            padding-left: 14px;
-            text-indent: -9px;
-            line-height: 1.4;
+           margin: 0 0 6px 0;
+           padding-left: 14px;
+           text-indent: -9px;
+           line-height: 1.4;
         }
         .resultado.erro {
             background-color: var(--warning-bg);
@@ -205,21 +195,7 @@
             border: 1px solid rgba(211, 47, 47, 0.2);
             text-align: left;
         }
-        .resultado.erro .aviso-icon {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--error);
 
-            width: 18px;
-            height: 18px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            line-height: 1;
-            flex-shrink: 0;
-}
         @media (max-width: 500px) {
             .container { margin: 16px; padding: 16px; }
             h1 { font-size: 20px; }
@@ -229,7 +205,38 @@
         select { color: #212121 !important; }
         select option { color: #212121 !important; background-color: #ffffff; }
 
-        /* Toggle */
+[data-lucide] {
+            stroke: currentColor;
+            stroke-width: 2.5;
+        }
+
+        .aviso-icon {
+            font-size: 20px;
+            line-height: 1;
+            flex-shrink: 0;
+            color: var(--warning-text);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .resultado.erro .aviso-icon {
+            color: var(--error);
+            width: 22px;
+            height: 22px;
+        }
+
+        @media (max-width: 500px) {
+            .aviso-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+            }
+        }
+
+        /* "Toggle" */
         .toggle-container {
             margin: 12px 0 28px 0;
             text-align: center;
@@ -276,10 +283,11 @@
         .toggle-btn:first-child { border-radius: 4px 0 0 4px; border-right: 1px solid rgba(0, 0, 0, 0.13); }
         .toggle-btn:last-child { border-radius: 0 4px 4px 0; }
         @media (max-width: 500px) {
-            .toggle-btn { padding: 11px 24px; min-width: 145px; font-size: 14.8px; }
+        .toggle-btn { padding: 11px 24px; min-width: 145px; font-size: 14.8px; }
         }
         
     </style>
+    
 </head>
 <body>
     <div class="container">
@@ -749,11 +757,11 @@ timeoutAvisoDose = setTimeout(() => {
 
 function mostrarAlerta(element, mensagem) {
     element.innerHTML = `
-        <div class="aviso-inner">
-            <span class="aviso-icon">⚠</span>
-            <div class="aviso-text">${mensagem}</div>
-        </div>
-    `;
+    <div class="aviso-inner">
+        <i data-lucide="alert-triangle" class="aviso-icon"></i>
+        <div class="aviso-text">${mensagem}</div>
+    </div>
+`;
     element.classList.remove('erro');
 }
 
@@ -765,10 +773,8 @@ function renderizarAlerta(valorCalculado, taxaMin, taxaMax, unidadeDose) {
 
     resultadoDiv.innerHTML = `
         <div class="aviso-inner" style="text-align: left;">
-            
-            <span class="aviso-icon aviso-icon-triangulo">⚠</span>
-
-            <div class="aviso-text">
+        <i data-lucide="alert-triangle" class="aviso-icon aviso-icon-triangulo"></i>
+        <div class="aviso-text">
                 <div class="aviso-item">
                     • Dose calculada: ${valorCalculado} ${unidadeDose}
                 </div>
@@ -885,7 +891,7 @@ function updateDoseInfo() {
     if (config.aviso) {
         const items = config.aviso.split('. ').map(s => s.trim()).filter(Boolean)
             .map(item => `<div class="aviso-item">• ${item.replace(/\.$/, '')}.</div>`).join('');
-        avisoElement.innerHTML = `<div class="aviso-inner"><span class="aviso-icon">⚠</span><div class="aviso-text">${items}</div></div>`;
+        avisoElement.innerHTML = `<div class="aviso-inner"><span class="aviso-icon">⚠︎</span><div class="aviso-text">${items}</div></div>`;
         avisoElement.style.display = 'block';
     } else {
         avisoElement.style.display = 'none';
@@ -1181,16 +1187,20 @@ return true;
 
 function mostrarErro(element, mensagem) {
     element.innerHTML = `
-        <div class="aviso-inner">
-            <span class="aviso-icon">⚠</span>
-            <div class="aviso-text">${mensagem}</div>
-        </div>
-    `;
+    <div class="aviso-inner">
+        <i data-lucide="alert-triangle" class="aviso-icon"></i>
+        <div class="aviso-text">${mensagem}</div>
+    </div>
+`;
     element.classList.remove('alerta');
     element.classList.add('erro');
 }
 
 /* EVENTOS */
+
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+});
 
 document.getElementById('medicamento').addEventListener('change', () => {
     state.memoria.dose = { valor: '', resultado: '' };
@@ -1410,6 +1420,7 @@ btnTaxa.addEventListener("click", () => {
 });
 
 updateDoseInfo();
+
 </script>
 </body>
 </html>
