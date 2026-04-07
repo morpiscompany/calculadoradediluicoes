@@ -185,11 +185,10 @@
             transform: translateY(2px);
             flex-shrink: 0;
     
-            color: var(--warning-text);   /* força vermelho sempre */
+            color: inherit;           /* herda a cor vermelha do aviso */
+            -webkit-text-fill-color: currentColor;  /* compatibilidade extra */
     
-            /* Remove a cor interna do emoji colorido */
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 0 var(--warning-text);
+            text-shadow: 0 0 0 currentColor;
         }
         .aviso-text {
             line-height: 1.4;
