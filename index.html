@@ -179,21 +179,27 @@
             align-items: flex-start;
             gap: 8px;
         }
-        .aviso .aviso-icon {
+        .aviso-icon {
             font-size: 18px;
             line-height: 1;
             transform: translateY(2px);
             flex-shrink: 0;
+    
+            color: var(--warning-text);   /* força vermelho sempre */
+    
+            /* Remove a cor interna do emoji colorido */
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 0 var(--warning-text);
         }
         .aviso-text {
             line-height: 1.4;
         }
-       .aviso-item {
-    margin: 0 0 6px 0;
-    padding-left: 14px;
-    text-indent: -9px;
-    line-height: 1.4;
-}
+        .aviso-item {
+            margin: 0 0 6px 0;
+            padding-left: 14px;
+            text-indent: -9px;
+            line-height: 1.4;
+        }
         .resultado.erro {
             background-color: var(--warning-bg);
             color: var(--warning-text);
