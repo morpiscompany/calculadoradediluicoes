@@ -393,9 +393,9 @@
                 aviso: 'TFG <30ml/min/1,73m² -  dose <3mcg/kg/min. Anúricos - dose de 1mcg/kg/min'
             },
             nitroglicerina: {
-                diluicoes: [{ amp: '5ml/245ml (0.2mg/ml)', concentracao: 0.2 }, 
-                            { amp: '10ml/240ml (0.4mg/ml)', concentracao: 0.4},
-                            { amp: '20ml/230ml (0.8mg/ml)', concentracao: 0.8 }
+                diluicoes: [{ amp: '5ml/245ml (0.1mg/ml)', concentracao: 0.1}, 
+                            { amp: '10ml/240ml (0.2mg/ml)', concentracao: 0.2},
+                            { amp: '20ml/230ml (0.4mg/ml)', concentracao: 0.4}
                 ],
                 unidadeDose: 'mcg/min',
                 perKg: false,
@@ -406,8 +406,8 @@
             },
             vasopressina: {
                 diluicoes: [
-                    { amp: '1ml (20UI)/49ml (0,4UI/ml)', concentracao: 0.4 },   // 20UI / 50ml = 0.4 UI/ml
-                    { amp: '2ml (40UI)/98ml (0,4UI/ml)', concentracao: 0.4 }
+                    { amp: '1ml (20UI)/49ml (0,4UI/ml)', concentracao: 1.0 },
+                    { amp: '2ml (40UI)/98ml (0,4UI/ml)', concentracao: 2.0 }
                 ],
                 unidadeDose: 'UI/min',
                 perKg: false,
@@ -415,7 +415,7 @@
                 doseMin: 0.01,
                 doseMax: 0.04,
                 aviso: 'Dose inicial: 0.03 UI/min. Manutenção: 0.01 a 0.04 UI/min. > 0.04 UI/min causa isquemia cardíaca'
-            },
+},
             epinefrina: {
                 diluicoes: [
                     { amp: '1ml/100ml SG 5% (10mcg/ml)', concentracao: 0.01 },
@@ -496,7 +496,7 @@
                 unidadeDose: 'mg/kg/h',
                 perKg: true,
                 perMin: false,
-                doseMin: 0.021,
+                doseMin: 0.02,
                 doseMax: 0.3,
                 aviso: ''
             },
@@ -1199,7 +1199,15 @@ document.getElementById('medicamento').addEventListener('change', () => {
 
 document.getElementById('dilution').addEventListener('change', () => {
     updateButtonState();
-    recalcularSePossivel();
+    
+    // FORÇA recálculo imediato se já houver valor digitado
+    const doseInput = document.getElementById('dose').value.trim();
+    if (doseInput && doseInput !== '') {
+        calcularTaxaInfusao();        // recálculo imediato
+    } else {
+        recalcularSePossivel();
+    }
+    
     sincronizarCalculos();
 });
 
