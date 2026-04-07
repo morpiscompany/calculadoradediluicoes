@@ -228,6 +228,16 @@
             height: 22px;
         }
 
+        .aviso-inner i[data-lucide] {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .aviso-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
         @media (max-width: 500px) {
             .aviso-icon {
                 font-size: 18px;
@@ -622,6 +632,13 @@ function resetarDadosPorMudancaDePeso() {
     updateButtonState();
 }
 
+function createLucideIcons() {
+    // Remove ícones antigos para evitar duplicação
+    document.querySelectorAll('svg[data-lucide-icon]').forEach(svg => svg.remove());
+    
+    lucide.createIcons();
+}
+
 function validatePesoInput(input) {
     let value = input.value.replace(/\./g, ',');
     
@@ -757,12 +774,13 @@ timeoutAvisoDose = setTimeout(() => {
 
 function mostrarAlerta(element, mensagem) {
     element.innerHTML = `
-    <div class="aviso-inner">
-        <i data-lucide="alert-triangle" class="aviso-icon"></i>
-        <div class="aviso-text">${mensagem}</div>
-    </div>
-`;
+        <div class="aviso-inner">
+            <i data-lucide="alert-triangle" class="aviso-icon"></i>
+            <div class="aviso-text">${mensagem}</div>
+        </div>
+    `;
     element.classList.remove('erro');
+    createLucideIcons();
 }
 
 function renderizarAlerta(valorCalculado, taxaMin, taxaMax, unidadeDose) {
@@ -790,6 +808,7 @@ function renderizarAlerta(valorCalculado, taxaMin, taxaMax, unidadeDose) {
 
         </div>
     `;
+    createLucideIcons();
 }
 
 function sincronizarCalculos() {
@@ -890,19 +909,20 @@ function updateDoseInfo() {
     const avisoElement = document.getElementById('aviso');
     
     if (config.aviso) {
-        const items = config.aviso.split('. ').map(s => s.trim()).filter(Boolean)
-            .map(item => `<div class="aviso-item">• ${item.replace(/\.$/, '')}.</div>`).join('');
-        
-        avisoElement.innerHTML = `
+    const items = config.aviso.split('. ').map(s => s.trim()).filter(Boolean)
+        .map(item => `<div class="aviso-item">• ${item.replace(/\.$/, '')}.</div>`).join('');
+
+    avisoElement.innerHTML = `
         <div class="aviso-inner">
-                <i data-lucide="alert-triangle" class="aviso-icon"></i>
-                <div class="aviso-text">${items}</div>
-            </div>
-        `;
-        avisoElement.style.display = 'block';
-    } else {
-        avisoElement.style.display = 'none';
-    }
+            <i data-lucide="alert-triangle" class="aviso-icon"></i>
+            <div class="aviso-text">${items}</div>
+        </div>
+    `;
+    avisoElement.style.display = 'block';
+    createLucideIcons();
+} else {
+    avisoElement.style.display = 'none';
+}
 
     const dilutionSelect = document.getElementById('dilution');
     dilutionSelect.innerHTML = '';
@@ -1199,6 +1219,7 @@ function mostrarErro(element, mensagem) {
 `;
     element.classList.remove('alerta');
     element.classList.add('erro');
+    createLucideIcons();
 }
 
 /* EVENTOS */
