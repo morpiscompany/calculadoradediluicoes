@@ -882,16 +882,23 @@ function updateDoseInfo() {
     if (!config) return;
 
     document.getElementById('doseUnit').textContent =
-    state.modo === "dose" ? config.unidadeDose : "ml/h";
+        state.modo === "dose" ? config.unidadeDose : "ml/h";
 
     document.getElementById('doseRange').textContent =
         `Dose recomendada: ${config.doseMin} - ${config.doseMax} ${config.unidadeDose}`;
 
     const avisoElement = document.getElementById('aviso');
+    
     if (config.aviso) {
         const items = config.aviso.split('. ').map(s => s.trim()).filter(Boolean)
             .map(item => `<div class="aviso-item">• ${item.replace(/\.$/, '')}.</div>`).join('');
-        avisoElement.innerHTML = `<div class="aviso-inner"><span class="aviso-icon">⚠︎</span><div class="aviso-text">${items}</div></div>`;
+        
+        avisoElement.innerHTML = `
+        <div class="aviso-inner">
+                <i data-lucide="alert-triangle" class="aviso-icon"></i>
+                <div class="aviso-text">${items}</div>
+            </div>
+        `;
         avisoElement.style.display = 'block';
     } else {
         avisoElement.style.display = 'none';
@@ -907,7 +914,6 @@ function updateDoseInfo() {
     });
 
 const labelDilution = document.getElementById('labelDilution');
-
 if (config.diluicoes.length === 1) {
     dilutionSelect.classList.add('single-option');
     dilutionSelect.disabled = true; // trava o select
@@ -920,7 +926,6 @@ if (config.diluicoes.length === 1) {
 
 const pesoContainer = document.getElementById('pesoContainer');
 const pesoInput = document.getElementById('peso');
-
 if (config.perKg) {
     pesoContainer.style.display = 'block';
     pesoInput.required = true;
