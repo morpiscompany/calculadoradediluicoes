@@ -584,7 +584,6 @@ let lastValidTaxa = '';
 let pesoAnterior = '';
 let pesoConfirmado = false;
 let timeoutAvisoDose = null;
-let textoOriginalDoseUnit = '';
 
 const state = {
     modo: "dose",                    // "dose" ou "taxa"
@@ -679,8 +678,6 @@ function exibirFeedbackErro(input, mensagem = '') {
     const small = document.getElementById('doseUnit');
 
     if (mensagem) {
-        if (!textoOriginalDoseUnit) textoOriginalDoseUnit = small.textContent;
-
         if (timeoutAvisoDose) clearTimeout(timeoutAvisoDose);
 
         small.style.color = 'var(--error)';
@@ -688,7 +685,7 @@ function exibirFeedbackErro(input, mensagem = '') {
 
         timeoutAvisoDose = setTimeout(() => {
             small.style.color = '';
-            small.textContent = textoOriginalDoseUnit;
+            small.textContent = obterUnidadeAtual(); // 🔥 SEMPRE DINÂMICO
             timeoutAvisoDose = null;
         }, 1500);
     }
@@ -769,7 +766,14 @@ function atualizarInterfaceMedicamento() {
     const config = medicamentosConfig[document.getElementById('medicamento').value];
     if (!config) return;
 
-    document.getElementById('doseUnit').textContent = state.modo === "dose" ? config.unidadeDose : "ml/h";
+    const small = document.getElementById('doseUnit');
+    small.style.color = '';
+    small.textContent = obterUnidadeAtual();
+
+    if (timeoutAvisoDose) {
+        clearTimeout(timeoutAvisoDose);
+        timeoutAvisoDose = null;
+}
     document.getElementById('doseRange').textContent = `Dose recomendada: ${config.doseMin} - ${config.doseMax} ${config.unidadeDose}`;
 
     const avisoElement = document.getElementById('aviso');
@@ -916,10 +920,28 @@ function alternarModoDoseTaxa() {
 
     document.getElementById('doseUnit').textContent = state.modo === "dose" ? config.unidadeDose : "ml/h";
     atualizarEstadoBotaoCalcular();
+
+    const small = document.getElementById('doseUnit');
+    small.style.color = '';
+    small.textContent = obterUnidadeAtual();
+
+    if (timeoutAvisoDose) {
+        clearTimeout(timeoutAvisoDose);
+        timeoutAvisoDose = null;
+}
 }
 
 function tentarRecalcularAutomatico() {
     if (document.getElementById('dose').value.trim()) processarCalculo();
+}
+
+function obterUnidadeAtual() {
+    const config = medicamentosConfig[document.getElementById('medicamento').value];
+    if (!config) return '';
+
+    return state.modo === "dose"
+        ? config.unidadeDose
+        : "ml/h";
 }
 
 // ====================== EVENTOS ======================
@@ -1011,6 +1033,12 @@ doseInput.addEventListener('input', function() {
         else state.memoria.taxa.resultado = null;
     }
     atualizarEstadoBotaoCalcular();
+
+    if (!timeoutAvisoDose) {
+        const small = document.getElementById('doseUnit');
+        small.style.color = '';
+        small.textContent = obterUnidadeAtual();
+}
 });
 
 document.getElementById('calcForm').addEventListener('submit', e => {
