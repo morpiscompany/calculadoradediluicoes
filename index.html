@@ -6,6 +6,7 @@
     <title>Calculadora de Diluição de Medicamentos</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
     <script src="https://unpkg.com/lucide@latest"></script>
+    
 <style>
 :root {
     --primary-color: #1976d2;
@@ -21,6 +22,8 @@
     --warning-text: #d32f2f;
     --shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* ==================== LAYOUT GERAL ==================== */
 body {
     font-family: 'Roboto', Arial, sans-serif;
     background-color: var(--background);
@@ -32,6 +35,7 @@ body {
     min-height: 100vh;
     font-size: 15px;
 }
+
 .container {
     background-color: var(--surface);
     padding: 25px;
@@ -41,17 +45,21 @@ body {
     max-width: 500px;
     text-align: center;
 }
+
 h1 {
     font-size: 25px;
     color: var(--text-primary);
     margin-bottom: 15px;
     font-weight: 500;
 }
+
+/* ==================== FORMULÁRIO ==================== */
 form {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
+
 form label {
     font-weight: 500;
     color: var(--text-primary);
@@ -59,6 +67,7 @@ form label {
     margin-bottom: 5px;
     font-size: 15px;
 }
+
 input, select {
     padding: 12px 15px;
     font-size: 15px;
@@ -69,10 +78,12 @@ input, select {
     background-color: var(--surface);
     transition: box-shadow 0.3s ease;
 }
+
 input[type="text"]::-webkit-inner-spin-button,
 input[type="text"]::-webkit-outer-spin-button {
     appearance: none;
 }
+
 select {
     appearance: none;
     background-image: url('data:image/svg+xml;utf8,<svg fill="%23757575" height="12" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18l-10-10h20z"/></svg>');
@@ -81,26 +92,33 @@ select {
     background-size: 24px;
     padding-right: 36px;
 }
+
 select#dilution.single-option {
     background-image: none;
     padding-right: 15px;
 }
+
+/* Focus e estados inválidos */
 input:focus,
 select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
 }
+
 input.invalid {
     border-color: var(--error) !important;
     box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.3) !important;
     animation: shake 0.4s ease-in-out;
 }
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-6px); }
     75% { transform: translateX(6px); }
 }
+
+/* Small texts */
 #doseRange,
 #pesoNote {
     color: var(--text-secondary);
@@ -108,9 +126,12 @@ input.invalid {
     display: block;
     margin-top: 5px;
 }
+
 #pesoNote {
     display: none;
 }
+
+/* ==================== BOTÃO ==================== */
 button {
     padding: 12px;
     font-size: 15px;
@@ -123,15 +144,19 @@ button {
     box-shadow: var(--shadow);
     width: 100%;
 }
+
 button:disabled {
     background-color: #cccccc;
     cursor: default;
     box-shadow: none;
 }
+
 button:hover:not(:disabled) {
     background-color: var(--primary-dark);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+/* ==================== RESULTADO E AVISOS ==================== */
 .resultado {
     margin-top: 15px;
     width: 100%;
@@ -146,9 +171,11 @@ button:hover:not(:disabled) {
     box-shadow: var(--shadow);
     transition: transform 0.2s ease;
 }
+
 .resultado:empty {
     display: none;
 }
+
 .aviso {
     display: block;
     background-color: var(--warning-bg);
@@ -162,32 +189,39 @@ button:hover:not(:disabled) {
     text-align: left;
     box-sizing: border-box;
 }
+
 .aviso-inner {
     display: flex;
     align-items: flex-start;
     gap: 8px;
 }
+
 .aviso-text {
     line-height: 1.4;
 }
+
 .aviso-item {
     margin: 0 0 6px 0;
     padding-left: 14px;
     text-indent: -9px;
     line-height: 1.4;
 }
+
 .resultado.erro {
     background-color: var(--warning-bg);
     color: var(--warning-text);
     border: 1px solid rgba(211, 47, 47, 0.2);
     text-align: left;
 }
+
+/* ==================== TOGGLE (Dose vs Taxa) ==================== */
 .toggle-container {
     margin: 12px 0 28px 0;
     text-align: center;
     display: flex;
     justify-content: center;
 }
+
 .toggle-buttons {
     display: inline-flex;
     background-color: #f1f3f5;
@@ -196,6 +230,7 @@ button:hover:not(:disabled) {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
     overflow: hidden;
 }
+
 .toggle-btn {
     padding: 12px 28px;
     font-size: 15px;
@@ -209,11 +244,13 @@ button:hover:not(:disabled) {
     white-space: nowrap;
     position: relative;
 }
+
 .toggle-btn:not(.ativo) {
     background-color: transparent;
     color: #666;
     box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.1);
 }
+
 .toggle-btn.ativo {
     background-color: #1976d2;
     color: white;
@@ -221,21 +258,27 @@ button:hover:not(:disabled) {
     box-shadow: 0 4px 8px rgba(25, 118, 210, 0.35), inset 0 -3px 4px rgba(255, 255, 255, 0.3);
     transform: translateY(-1px);
 }
+
 .toggle-btn:hover:not(.ativo) {
     background-color: #e9ecef;
     color: #333;
 }
+
 .toggle-btn:first-child {
     border-radius: 4px 0 0 4px;
     border-right: 1px solid rgba(0, 0, 0, 0.13);
 }
+
 .toggle-btn:last-child {
     border-radius: 0 4px 4px 0;
 }
+
+/* ==================== ÍCONES LUCIDE ==================== */
 [data-lucide] {
     stroke: currentColor;
     stroke-width: 2.5;
 }
+
 .aviso-icon {
     font-size: 20px;
     line-height: 1;
@@ -247,17 +290,22 @@ button:hover:not(:disabled) {
     align-items: center;
     justify-content: center;
 }
+
 .resultado.erro .aviso-icon {
     color: var(--error);
 }
+
 .aviso-inner i[data-lucide] {
     margin-top: 2px;
     flex-shrink: 0;
 }
+
 .aviso-icon svg {
     width: 100%;
     height: 100%;
 }
+
+/* ==================== RESPONSIVO ==================== */
 @media (max-width: 500px) {
     .container { margin: 16px; padding: 16px; }
     h1 { font-size: 20px; }
@@ -266,24 +314,32 @@ button:hover:not(:disabled) {
     .toggle-btn { padding: 11px 24px; min-width: 145px; font-size: 14.8px; }
     .aviso-icon { font-size: 18px; width: 18px; height: 18px; }
 }
+
+/* ==================== CORES FIXAS ==================== */
 select {
     color: #212121 !important;
 }
+
 select option {
     color: #212121 !important;
     background-color: #ffffff;
 }
 </style>
 </head>
+
+
+
 <body>
     <div class="container">
         <h1>Calculadora de Diluição de Medicamentos</h1>
+
         <form id="calcForm">
             <div class="campo" id="pesoContainer">
                 <label for="peso">Peso do Paciente (kg):</label>
                 <input type="text" id="peso" placeholder="Ex: 70" required>
                 <small id="pesoNote"></small>
             </div>
+
             <div class="campo">
                 <label for="medicamento">Selecione o Medicamento:</label>
                 <select id="medicamento" required>
@@ -311,12 +367,15 @@ select option {
                     </optgroup>
                 </select>
             </div>
+
             <div class="campo">
                 <label for="dilution" id="labelDilution">Selecione a Diluição:</label>
                 <select id="dilution" required></select>
             </div>
+
             <small id="doseRange"></small>
             <div id="aviso" class="aviso"></div>
+
             <div class="campo">
                 <div class="toggle-container">
                     <div class="toggle-buttons">
@@ -327,11 +386,15 @@ select option {
                 <input type="text" id="dose" placeholder="Ex: 0.1" aria-describedby="doseUnit" required>
                 <small id="doseUnit" aria-label="Unidade da dose desejada"></small>
             </div>
+
             <button type="submit" disabled>Calcular</button>
         </form>
+
         <div id="resultado" class="resultado" aria-live="polite"></div>
     </div>
+
 <script>
+// ====================== CONFIGURAÇÃO DOS MEDICAMENTOS ======================
 const medicamentosConfig = {
     noradrenalina: {
         diluicoes: [
@@ -511,6 +574,8 @@ const medicamentosConfig = {
         aviso: 'Dose inicial: 0.1 a 0.2 mg/kg bolus (ou 15mg bolus)'
     }
 };
+
+// ====================== VARIÁVEIS GLOBAIS ======================
 let hasCalculated = false;
 let resultadoValido = false;
 let lastValidPeso = '';
@@ -520,48 +585,54 @@ let pesoAnterior = '';
 let pesoConfirmado = false;
 let timeoutAvisoDose = null;
 let textoOriginalDoseUnit = '';
+
 const state = {
-    modo: "dose",
+    modo: "dose",                    // "dose" ou "taxa"
     memoria: {
         dose: { valor: '', resultado: null },
         taxa: { valor: '', resultado: null }
     }
 };
+
+// ====================== VALIDAÇÃO DE CAMPOS ======================
+// Valida entrada do usuário (peso, dose ou taxa) com regras específicas
+// ====================== VALIDAÇÃO DE CAMPOS ======================
 function validarCampo(input, tipo) {
-    let value = input.value.replace(/\./g, ',');
+    let value = input.value.replace(/\./g, ',').trim();
     const config = medicamentosConfig[document.getElementById('medicamento').value];
+
     if (!value) {
-        input.value = '';
         input.classList.remove('invalid');
         if (tipo === 'peso') lastValidPeso = '';
         else if (tipo === 'dose') lastValidDose = '';
         else if (tipo === 'taxa') lastValidTaxa = '';
         return;
     }
+
+    // Bloqueios básicos de formato
     if (/^,/.test(value) || (value.match(/,/g) || []).length > 1) {
         exibirFeedbackErro(input);
         restaurarUltimoValorValido(input, tipo);
         return;
     }
+
     let regex, maxValue, maxDecimals;
     if (tipo === 'peso') {
         regex = /^[0-9]{0,3}(,[0-9]{0,3})?$/;
         maxValue = 650;
         maxDecimals = 3;
-    } else if (tipo === 'dose') {
+    } else if (tipo === 'dose' || tipo === 'taxa') {
         regex = /^[0-9]{0,3}(,[0-9]{0,2})?$/;
-        maxValue = config ? config.doseMax : Infinity;
-        maxDecimals = 2;
-    } else if (tipo === 'taxa') {
-        regex = /^[0-9]{0,3}(,[0-9]{0,2})?$/;
-        maxValue = 999;
+        maxValue = (tipo === 'dose' && config) ? config.doseMax : 999;
         maxDecimals = 2;
     }
+
     if (!regex.test(value)) {
         exibirFeedbackErro(input);
         restaurarUltimoValorValido(input, tipo);
         return;
     }
+
     if (value.includes(',')) {
         const partes = value.split(',');
         if (partes[1].length > maxDecimals) {
@@ -570,67 +641,51 @@ function validarCampo(input, tipo) {
             return;
         }
     }
-    const num = parseFloat(value.replace(',', '.'));
-    if (tipo === 'dose' && config && !isNaN(num)) {
-        const doseMin = config.doseMin;
-    if (doseMin >= 1) {
-        if (value.startsWith('0')) {
-            exibirFeedbackErro(input);
-            restaurarUltimoValorValido(input, tipo);
-            return;
-        }
-        if (num < doseMin) {
-            exibirFeedbackErro(input);
-            restaurarUltimoValorValido(input, tipo);
-            return;
-        }
-    }
-    else {
-        if (num < doseMin) {
-            const partes = value.split(',');
-            const inteiro = partes[0];
-            const decimal = partes[1] || '';
-            if (value === '0' || value.endsWith(',')) return;
-            const valorPossivelMax = parseFloat(
-                (inteiro + ',' + decimal.padEnd(2, '9')).replace(',', '.')
-            );
-            if (valorPossivelMax < doseMin) {
-                exibirFeedbackErro(input);
-                restaurarUltimoValorValido(input, tipo);
-                return;
-            }
-        }
-    }
-}
+
+    const num = parseFloat(value.replace(',', '.')) || 0;
+
+    // Bloqueio de valor máximo
     if (!isNaN(num) && num > maxValue) {
-        if (tipo === 'dose') {
-            exibirFeedbackErro(input, `Máximo: ${config.doseMax}`);
-        } else if (tipo === 'peso') {
-            exibirFeedbackErro(input);
-        }
+        exibirFeedbackErro(input, tipo === 'dose' ? `Máximo: ${config ? config.doseMax : ''}` : '');
         restaurarUltimoValorValido(input, tipo);
         return;
     }
+
+    // Valor válido
     input.classList.remove('invalid');
     input.value = value;
+
     if (tipo === 'peso') lastValidPeso = value;
     else if (tipo === 'dose') lastValidDose = value;
     else if (tipo === 'taxa') lastValidTaxa = value;
 }
+
 function restaurarUltimoValorValido(input, tipo) {
-    if (tipo === 'peso') input.value = lastValidPeso || '';
-    else if (tipo === 'dose') input.value = lastValidDose || '';
-    else if (tipo === 'taxa') input.value = lastValidTaxa || '';
+    let valorRestaurar = '';
+    if (tipo === 'peso') valorRestaurar = lastValidPeso || '';
+    else if (tipo === 'dose') valorRestaurar = lastValidDose || '';
+    else if (tipo === 'taxa') valorRestaurar = lastValidTaxa || '';
+
+    input.value = valorRestaurar;
+    input.classList.add('invalid');
+    setTimeout(() => input.classList.remove('invalid'), 800);
 }
+
+// Exibe feedback visual de erro (piscar vermelho + mensagem temporária)
 function exibirFeedbackErro(input, mensagem = '') {
     input.classList.add('invalid');
     setTimeout(() => input.classList.remove('invalid'), 800);
+
     const small = document.getElementById('doseUnit');
+
     if (mensagem) {
         if (!textoOriginalDoseUnit) textoOriginalDoseUnit = small.textContent;
+
         if (timeoutAvisoDose) clearTimeout(timeoutAvisoDose);
+
         small.style.color = 'var(--error)';
         small.textContent = mensagem;
+
         timeoutAvisoDose = setTimeout(() => {
             small.style.color = '';
             small.textContent = textoOriginalDoseUnit;
@@ -638,30 +693,41 @@ function exibirFeedbackErro(input, mensagem = '') {
         }, 1500);
     }
 }
+
+// ====================== CÁLCULOS ======================
 function calcularValor(dose, config, peso, dil) {
     let dosePorHora = dose;
     if (config.perKg) dosePorHora *= peso;
     if (config.perMin) dosePorHora *= 60;
+
     const isMcg = config.unidadeDose.startsWith('mcg');
     const doseConvertida = isMcg ? dosePorHora / 1000 : dosePorHora;
+
 if (dil.calculoEspecial) {
     return dil.calculoEspecial(peso, dose);
 }
+
 return (doseConvertida / dil.concentracao);
 }
+
+// Processa o cálculo principal conforme o modo atual (Dose ou Taxa)
 function processarCalculo() {
     const config = medicamentosConfig[document.getElementById('medicamento').value];
     let peso = parseFloat(document.getElementById('peso').value.replace(',', '.')) || 1;
     if (!config.perKg) {
     peso = 1;
 }
+
     const dose = parseFloat(document.getElementById('dose').value.replace(',', '.'));
     const dil = config.diluicoes[parseInt(document.getElementById('dilution').value)];
     const resultadoDiv = document.getElementById('resultado');
+
     if (!dil) return mostrarErro(resultadoDiv, 'Diluição inválida.');
     if (config.perKg && (isNaN(peso) || peso <= 0)) return mostrarErro(resultadoDiv, 'Insira um peso válido.');
     if (isNaN(dose) || dose <= 0) return mostrarErro(resultadoDiv, 'Insira uma dose válida.');
+
     const isMcg = config.unidadeDose.startsWith('mcg');
+
     if (state.modo === "dose") {
         const taxa = calcularValor(dose, config, peso, dil);
         renderizarResultado(taxa, "Taxa de infusão", "ml/h");
@@ -673,7 +739,9 @@ function processarCalculo() {
         let doseBase = dose * dil.concentracao;
         if (config.perMin) doseBase /= 60;
         if (config.perKg) doseBase /= peso;
+
         const doseCalculada = (isMcg ? doseBase * 1000 : doseBase);
+
         if (doseCalculada < config.doseMin || doseCalculada > config.doseMax) {
             const taxaMin = calcularValor(config.doseMin, config, peso, dil);
             const taxaMax = calcularValor(config.doseMax, config, peso, dil);
@@ -684,18 +752,26 @@ function processarCalculo() {
             state.memoria.taxa = { valor: document.getElementById('dose').value, resultado: { tipo: "normal", valor: doseCalculada } };
         }
     }
+
     hasCalculated = true;
     resultadoValido = true;
+
     if (document.getElementById('peso').value) {
         pesoAnterior = document.getElementById('peso').value;
         pesoConfirmado = true;
     }
 }
+
+// ====================== INTERFACE ======================
+
+// Atualiza toda a interface quando o medicamento é alterado
 function atualizarInterfaceMedicamento() {
     const config = medicamentosConfig[document.getElementById('medicamento').value];
     if (!config) return;
+
     document.getElementById('doseUnit').textContent = state.modo === "dose" ? config.unidadeDose : "ml/h";
     document.getElementById('doseRange').textContent = `Dose recomendada: ${config.doseMin} - ${config.doseMax} ${config.unidadeDose}`;
+
     const avisoElement = document.getElementById('aviso');
     if (config.aviso) {
         const items = config.aviso.split('. ').map(s => s.trim()).filter(Boolean)
@@ -706,6 +782,7 @@ function atualizarInterfaceMedicamento() {
     } else {
         avisoElement.style.display = 'none';
     }
+
     const select = document.getElementById('dilution');
     select.innerHTML = '';
     config.diluicoes.forEach((dil, i) => {
@@ -714,6 +791,7 @@ function atualizarInterfaceMedicamento() {
         opt.textContent = dil.amp;
         select.appendChild(opt);
     });
+
     const label = document.getElementById('labelDilution');
     if (config.diluicoes.length === 1) {
         select.classList.add('single-option');
@@ -724,6 +802,7 @@ function atualizarInterfaceMedicamento() {
         select.disabled = false;
         label.textContent = "Selecione a Diluição:";
     }
+
     const pesoContainer = document.getElementById('pesoContainer');
     const pesoInput = document.getElementById('peso');
     if (config.perKg) {
@@ -734,19 +813,28 @@ function atualizarInterfaceMedicamento() {
         pesoInput.value = '';
         pesoInput.required = false;
     }
+
     atualizarEstadoBotaoCalcular();
 }
+
+// Habilita/desabilita o botão "Calcular"
 function atualizarEstadoBotaoCalcular() {
     const config = medicamentosConfig[document.getElementById('medicamento').value];
     if (!config) return;
+
     let peso = parseFloat(document.getElementById('peso').value.replace(',', '.')) || 0;
     if (!config.perKg) peso = 1;
+
     const dose = parseFloat(document.getElementById('dose').value.replace(',', '.')) || 0;
     const isPesoValid = !config.perKg || (peso > 0 && peso <= 650);
     const isDoseValid = dose > 0;
     const isDilutionValid = !isNaN(parseInt(document.getElementById('dilution').value));
+
     document.querySelector('button[type="submit"]').disabled = !(isPesoValid && isDoseValid && isDilutionValid);
 }
+
+// ====================== FUNÇÕES AUXILIARES ======================
+
 function resetResultado() {
     const div = document.getElementById('resultado');
     div.innerHTML = '';
@@ -754,6 +842,7 @@ function resetResultado() {
     hasCalculated = false;
     resultadoValido = false;
 }
+
 function renderizarResultado(valor, titulo, unidade) {
     const div = document.getElementById('resultado');
     div.classList.remove('erro', 'alerta');
@@ -762,6 +851,7 @@ function renderizarResultado(valor, titulo, unidade) {
 
     div.innerHTML = `<strong>${titulo}:</strong> ${valorFormatado} ${unidade}`;
 }
+
 function renderizarAlerta(valorCalculado, taxaMin, taxaMax, unidadeDose) {
     const div = document.getElementById('resultado');
     div.classList.add('erro');
@@ -776,6 +866,7 @@ function renderizarAlerta(valorCalculado, taxaMin, taxaMax, unidadeDose) {
     `;
     createLucideIcons();
 }
+
 function mostrarErro(element, mensagem) {
     element.innerHTML = `
         <div class="aviso-inner">
@@ -786,9 +877,11 @@ function mostrarErro(element, mensagem) {
     element.classList.add('erro');
     createLucideIcons();
 }
+
 function createLucideIcons() {
     lucide.createIcons();
 }
+
 function resetarAoAlterarPeso() {
     document.getElementById('dose').value = '';
     lastValidDose = '';
@@ -798,6 +891,7 @@ function resetarAoAlterarPeso() {
     resetResultado();
     atualizarEstadoBotaoCalcular();
 }
+
 function alternarModoDoseTaxa() {
     const doseInput = document.getElementById("dose");
     const config = medicamentosConfig[document.getElementById('medicamento').value];
@@ -819,32 +913,42 @@ function alternarModoDoseTaxa() {
             } else resetResultado();
         }
     }
+
     document.getElementById('doseUnit').textContent = state.modo === "dose" ? config.unidadeDose : "ml/h";
     atualizarEstadoBotaoCalcular();
 }
+
 function tentarRecalcularAutomatico() {
     if (document.getElementById('dose').value.trim()) processarCalculo();
 }
+
+// ====================== EVENTOS ======================
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     atualizarInterfaceMedicamento();
 });
+
 document.getElementById('medicamento').addEventListener('change', () => {
     state.memoria.dose = { valor: '', resultado: null };
     state.memoria.taxa = { valor: '', resultado: null };
     hasCalculated = false;
+
     document.getElementById('dose').value = '';
     lastValidDose = '';
     resetResultado();
+
     atualizarInterfaceMedicamento();
 });
+
 document.getElementById('dilution').addEventListener('change', () => {
     atualizarEstadoBotaoCalcular();
     tentarRecalcularAutomatico();
 });
+
 document.getElementById('peso').addEventListener('input', function() {
     validarCampo(this, 'peso');
     const pesoAtual = this.value;
+
     if (!pesoAtual) {
         if (pesoConfirmado) resetarAoAlterarPeso();
         pesoAnterior = '';
@@ -852,16 +956,53 @@ document.getElementById('peso').addEventListener('input', function() {
         atualizarEstadoBotaoCalcular();
         return;
     }
+
     if (!pesoConfirmado) {
         pesoAnterior = pesoAtual;
         atualizarEstadoBotaoCalcular();
         return;
     }
+
     if (pesoAtual !== pesoAnterior) resetarAoAlterarPeso();
     pesoAnterior = pesoAtual;
     atualizarEstadoBotaoCalcular();
 });
-document.getElementById('dose').addEventListener('input', function() {
+
+// ====================== LISTENER DO CAMPO DOSE (VERSÃO CORRIGIDA) ======================
+const doseInput = document.getElementById('dose');
+
+doseInput.addEventListener('beforeinput', function(e) {
+    if (state.modo !== "dose") return;
+
+    const config = medicamentosConfig[document.getElementById('medicamento').value];
+    if (!config) return;
+
+    const doseMin = config.doseMin;
+
+    // Valor atual + o que o usuário está tentando digitar
+    let current = this.value.replace(/\./g, ',');
+    let upcoming = current;
+
+    if (e.data !== null && e.data !== undefined) {
+        upcoming = current + e.data;
+    }
+
+    const numTest = parseFloat(upcoming.replace(',', '.')) || 0;
+
+    // Permite sempre valores parciais (0, 0, 0, 0,2 etc.)
+    const partialStages = ['0', '0,', '0,0', '0,00', '0,2'];
+
+    // Só bloqueia se for um valor completo (2 casas decimais) E estiver abaixo do mínimo
+    if (upcoming.includes(',') && upcoming.split(',')[1].length >= 2) {
+        if (numTest > 0 && numTest < doseMin && !partialStages.includes(upcoming)) {
+            e.preventDefault();           // Bloqueia só o dígito inválido
+            exibirFeedbackErro(this);
+            return;
+        }
+    }
+});
+
+doseInput.addEventListener('input', function() {
     validarCampo(this, state.modo === "dose" ? 'dose' : 'taxa');
 
     if (resultadoValido) {
@@ -871,12 +1012,15 @@ document.getElementById('dose').addEventListener('input', function() {
     }
     atualizarEstadoBotaoCalcular();
 });
+
 document.getElementById('calcForm').addEventListener('submit', e => {
     e.preventDefault();
     processarCalculo();
 });
+
 const btnDose = document.getElementById("modoDose");
 const btnTaxa = document.getElementById("modoTaxa");
+
 btnDose.addEventListener("click", () => {
     state.modo = "dose";
     btnDose.classList.add("ativo");
@@ -884,6 +1028,7 @@ btnDose.addEventListener("click", () => {
     alternarModoDoseTaxa();
     tentarRecalcularAutomatico();
 });
+
 btnTaxa.addEventListener("click", () => {
     state.modo = "taxa";
     btnTaxa.classList.add("ativo");
