@@ -6,310 +6,284 @@
     <title>Calculadora de Diluição de Medicamentos</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        
-        :root {
-            --primary-color: #1976d2;
-            --primary-light: #63a4ff;
-            --primary-dark: #004ba0;
-            --secondary-color: #dc004e;
-            --background: #f5f5f5;
-            --surface: #ffffff;
-            --text-primary: #212121;
-            --text-secondary: #757575;
-            --error: #d32f2f;
-            --warning-bg: #ffebee;
-            --warning-text: #d32f2f;
-            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            background-color: var(--background);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-size: 15px;
-        }
-        .container {
-            background-color: var(--surface);
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-        }
-        h1 {
-            font-size: 25px;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        form label {
-            font-weight: 500;
-            color: var(--text-primary);
-            display: block;
-            margin-bottom: 5px;
-            font-size: 15px;
-        }
-        input, select {
-            padding: 12px 15px;
-            font-size: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 100%;
-            box-sizing: border-box;
-            background-color: var(--surface);
-            transition: box-shadow 0.3s ease;
-            margin-top: 0;
-        }
-        input[type="text"]::-webkit-inner-spin-button,
-        input[type="text"]::-webkit-outer-spin-button {
-            appearance: none;
-        }
-        select {
-            appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg fill="%23757575" height="12" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18l-10-10h20z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 24px;
-            padding-right: 36px;
-        }
-        select#dilution.single-option {
-            background-image: none;
-            padding-right: 15px;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
-        }
-       input.invalid {
+<style>
+:root {
+    --primary-color: #1976d2;
+    --primary-light: #63a4ff;
+    --primary-dark: #004ba0;
+    --secondary-color: #dc004e;
+    --background: #f5f5f5;
+    --surface: #ffffff;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --error: #d32f2f;
+    --warning-bg: #ffebee;
+    --warning-text: #d32f2f;
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: var(--background);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 15px;
+}
+.container {
+    background-color: var(--surface);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+h1 {
+    font-size: 25px;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+form label {
+    font-weight: 500;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+input, select {
+    padding: 12px 15px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--surface);
+    transition: box-shadow 0.3s ease;
+}
+input[type="text"]::-webkit-inner-spin-button,
+input[type="text"]::-webkit-outer-spin-button {
+    appearance: none;
+}
+select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23757575" height="12" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18l-10-10h20z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 24px;
+    padding-right: 36px;
+}
+select#dilution.single-option {
+    background-image: none;
+    padding-right: 15px;
+}
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+input.invalid {
     border-color: var(--error) !important;
     box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.3) !important;
     animation: shake 0.4s ease-in-out;
 }
-
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25%  { transform: translateX(-6px); }
-    75%  { transform: translateX(6px); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
 }
-        #doseRange {
-            color: var(--text-secondary);
-            font-size: 12px;
-            display: block;
-            margin-top: 5px;
-        }
-        #aviso {
-            margin-top: 4px;
-        }
-        #pesoNote {
-            color: var(--text-secondary);
-            font-size: 12px;
-            display: none;
-            margin-top: 5px;
-        }
-        button {
-            padding: 12px;
-            font-size: 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: var(--shadow);
-            width: 100%;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: default;
-            box-shadow: none;
-        }
-        button:hover:not(:disabled) {
-            background-color: var(--primary-dark);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .resultado {
-            margin-top: 15px;
-
-            width: 100%;
-            box-sizing: border-box;
-
-            padding: 12px 15px;
-
-            border-radius: 4px;
-            border: 1px solid #ccc;
-
-            background-color: var(--surface);
-            color: var(--text-primary);
-
-            font-size: 15px;
-            text-align: center;
-
-            box-shadow: var(--shadow);
-            transition: transform 0.2s ease;
-        }
-        .resultado:empty {
-            display: none;
-        }
-        .aviso {
-            display: block;
-            background-color: var(--warning-bg);
-            color: var(--warning-text);
-            border-radius: 8px;
-            border: 1px solid rgba(211, 47, 47, 0.2);
-            margin-top: 4px;
-            margin-bottom: 1px;
-            padding: 12px;
-            font-size: 15px;
-            text-align: left;
-            box-sizing: border-box;
-        }
-        .aviso-inner {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-        }
-        .aviso-text {
-            line-height: 1.4;
-        }
-        .aviso-item {
-           margin: 0 0 6px 0;
-           padding-left: 14px;
-           text-indent: -9px;
-           line-height: 1.4;
-        }
-        .resultado.erro {
-            background-color: var(--warning-bg);
-            color: var(--warning-text);
-            border: 1px solid rgba(211, 47, 47, 0.2);
-            text-align: left;
-        }
-
-        @media (max-width: 500px) {
-            .container { margin: 16px; padding: 16px; }
-            h1 { font-size: 20px; }
-            button { padding: 10px; }
-            .aviso { padding: 12px; font-size: 12px; margin-top: 4px; }
-        }
-        select { color: #212121 !important; }
-        select option { color: #212121 !important; background-color: #ffffff; }
-
+#doseRange,
+#pesoNote {
+    color: var(--text-secondary);
+    font-size: 12px;
+    display: block;
+    margin-top: 5px;
+}
+#pesoNote {
+    display: none;
+}
+button {
+    padding: 12px;
+    font-size: 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--shadow);
+    width: 100%;
+}
+button:disabled {
+    background-color: #cccccc;
+    cursor: default;
+    box-shadow: none;
+}
+button:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.resultado {
+    margin-top: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 15px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: var(--surface);
+    color: var(--text-primary);
+    font-size: 15px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease;
+}
+.resultado:empty {
+    display: none;
+}
+.aviso {
+    display: block;
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+    border-radius: 8px;
+    border: 1px solid rgba(211, 47, 47, 0.2);
+    margin-top: 4px;
+    margin-bottom: 1px;
+    padding: 12px;
+    font-size: 15px;
+    text-align: left;
+    box-sizing: border-box;
+}
+.aviso-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+.aviso-text {
+    line-height: 1.4;
+}
+.aviso-item {
+    margin: 0 0 6px 0;
+    padding-left: 14px;
+    text-indent: -9px;
+    line-height: 1.4;
+}
+.resultado.erro {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid rgba(211, 47, 47, 0.2);
+    text-align: left;
+}
+.toggle-container {
+    margin: 12px 0 28px 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+.toggle-buttons {
+    display: inline-flex;
+    background-color: #f1f3f5;
+    padding: 0;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+.toggle-btn {
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    min-width: 158px;
+    border-radius: 4px;
+    transition: all 0.35s ease;
+    white-space: nowrap;
+    position: relative;
+}
+.toggle-btn:not(.ativo) {
+    background-color: transparent;
+    color: #666;
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+.toggle-btn.ativo {
+    background-color: #1976d2;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.35), inset 0 -3px 4px rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+.toggle-btn:hover:not(.ativo) {
+    background-color: #e9ecef;
+    color: #333;
+}
+.toggle-btn:first-child {
+    border-radius: 4px 0 0 4px;
+    border-right: 1px solid rgba(0, 0, 0, 0.13);
+}
+.toggle-btn:last-child {
+    border-radius: 0 4px 4px 0;
+}
 [data-lucide] {
-            stroke: currentColor;
-            stroke-width: 2.5;
-        }
-
-        .aviso-icon {
-            font-size: 20px;
-            line-height: 1;
-            flex-shrink: 0;
-            color: var(--warning-text);
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .resultado.erro .aviso-icon {
-            color: var(--error);
-            width: 20px;
-            height: 20px;
-        }
-
-        .aviso-inner i[data-lucide] {
-            margin-top: 2px;
-            flex-shrink: 0;
-        }
-
-        .aviso-icon svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        @media (max-width: 500px) {
-            .aviso-icon {
-                font-size: 18px;
-                width: 18px;
-                height: 18px;
-            }
-        }
-
-        /* "Toggle" */
-        .toggle-container {
-            margin: 12px 0 28px 0;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-        }
-        .toggle-buttons {
-            display: inline-flex;
-            background-color: #f1f3f5;
-            padding: 0px;
-            border-radius: 4px;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
-        .toggle-btn {
-            padding: 12px 28px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            outline: none;
-            min-width: 158px;
-            border-radius: 4px;
-            transition: all 0.35s ease;
-            white-space: nowrap;
-            position: relative;
-        }
-        .toggle-btn:not(.ativo) {
-            background-color: transparent;
-            color: #666;
-            box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.1);
-        }
-        .toggle-btn.ativo {
-            background-color: #1976d2;
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 4px 8px rgba(25, 118, 210, 0.35), inset 0 -3px 4px rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
-        }
-        .toggle-btn:hover:not(.ativo) {
-            background-color: #e9ecef;
-            color: #333;
-        }
-        .toggle-btn:first-child { border-radius: 4px 0 0 4px; border-right: 1px solid rgba(0, 0, 0, 0.13); }
-        .toggle-btn:last-child { border-radius: 0 4px 4px 0; }
-        @media (max-width: 500px) {
-        .toggle-btn { padding: 11px 24px; min-width: 145px; font-size: 14.8px; }
-        }
-        
-    </style>
-    
+    stroke: currentColor;
+    stroke-width: 2.5;
+}
+.aviso-icon {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+    color: var(--warning-text);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.resultado.erro .aviso-icon {
+    color: var(--error);
+}
+.aviso-inner i[data-lucide] {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+.aviso-icon svg {
+    width: 100%;
+    height: 100%;
+}
+@media (max-width: 500px) {
+    .container { margin: 16px; padding: 16px; }
+    h1 { font-size: 20px; }
+    button { padding: 10px; }
+    .aviso { padding: 12px; font-size: 12px; margin-top: 4px; }
+    .toggle-btn { padding: 11px 24px; min-width: 145px; font-size: 14.8px; }
+    .aviso-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+select {
+    color: #212121 !important;
+}
+select option {
+    color: #212121 !important;
+    background-color: #ffffff;
+}
+</style>
 </head>
 <body>
     <div class="container">
         <h1>Calculadora de Diluição de Medicamentos</h1>
-
         <form id="calcForm">
             <div class="campo" id="pesoContainer">
                 <label for="peso">Peso do Paciente (kg):</label>
                 <input type="text" id="peso" placeholder="Ex: 70" required>
                 <small id="pesoNote"></small>
             </div>
-
             <div class="campo">
                 <label for="medicamento">Selecione o Medicamento:</label>
                 <select id="medicamento" required>
@@ -337,15 +311,12 @@
                     </optgroup>
                 </select>
             </div>
-
             <div class="campo">
-               <label for="dilution" id="labelDilution">Selecione a Diluição:</label>
+                <label for="dilution" id="labelDilution">Selecione a Diluição:</label>
                 <select id="dilution" required></select>
             </div>
-
             <small id="doseRange"></small>
             <div id="aviso" class="aviso"></div>
-
             <div class="campo">
                 <div class="toggle-container">
                     <div class="toggle-buttons">
@@ -356,193 +327,190 @@
                 <input type="text" id="dose" placeholder="Ex: 0.1" aria-describedby="doseUnit" required>
                 <small id="doseUnit" aria-label="Unidade da dose desejada"></small>
             </div>
-
             <button type="submit" disabled>Calcular</button>
         </form>
-
         <div id="resultado" class="resultado" aria-live="polite"></div>
     </div>
-
-    <script>
-        const medicamentosConfig = {
-            noradrenalina: {
-                diluicoes: [
-                    { amp: '8ml/242ml SG 5% (32mcg/ml)', concentracao: 0.032 },   // 32 mcg/ml = 0.032 mg/ml
-                    { amp: '16ml/234ml SG 5% (64mcg/ml)', concentracao: 0.064 },   // 64 mcg/ml
-                    { amp: '32ml/218ml SG 5% (128mcg/ml)', concentracao: 0.128 }    // 128 mcg/ml
-                ],
-                unidadeDose: 'mcg/kg/min',
-                perKg: true,
-                perMin: true,
-                doseMin: 0.02,
-                doseMax: 3.3,
-                aviso: 'Dose inicial: 0.05 a 0.15 mcg/kg/min. Manutenção: 0.025 a 1 mcg/kg/min. Máxima: 1 a 3.3 mcg/kg/min'
-            },
-            dobutamina: {
-                diluicoes: [
-                    { amp: '20ml/230ml (1mg/ml)', concentracao: 1 },
-                    { amp: '40ml/210ml (2mg/ml)', concentracao: 2 },
-                    { amp: '80ml/170ml (4mg/ml)', concentracao: 4 }
-                ],
-                unidadeDose: 'mcg/kg/min',
-                perKg: true,
-                perMin: true,
-                doseMin: 2,
-                doseMax: 20,
-                aviso: 'Dose inicial: 2 a 5 mcg/kg/min. Manutenção: 2 a 10 mcg/kg/min. Máxima: 20 mcg/kg/min'
-            },
-            dopamina: {
-                diluicoes: [
-                    { amp: '50ml/200ml (1mg/ml)', concentracao: 1 },
-                    { amp: '100ml/150ml (2mg/ml)', concentracao: 2 }
-                ],
-                unidadeDose: 'mcg/kg/min',
-                perKg: true,
-                perMin: true,
-                doseMin: 2,
-                doseMax: 20,
-                aviso: 'Dose inicial: 2 a 5 mcg/kg/min. Manutenção: 2 a 20 mcg/kg/min. Máxima: 20 mcg/kg/min'
-            },
-            nitroprussiato: {
-                diluicoes: [
-                    { amp: '2ml/248ml (0.2mg/ml)', concentracao: 0.2 },
-                    { amp: '4ml/246ml (0.4mg/ml)', concentracao: 0.4 }
-                ],
-                unidadeDose: 'mcg/kg/min',
-                perKg: true,
-                perMin: true,
-                doseMin: 0.2,
-                doseMax: 10,
-                aviso: 'TFG <30ml/min/1,73m² -  dose <3mcg/kg/min. Anúricos - dose de 1mcg/kg/min'
-            },
-            nitroglicerina: {
-                diluicoes: [{ amp: '5ml/245ml (0.1mg/ml)', concentracao: 0.1}, 
-                            { amp: '10ml/240ml (0.2mg/ml)', concentracao: 0.2},
-                            { amp: '20ml/230ml (0.4mg/ml)', concentracao: 0.4}
-                ],
-                unidadeDose: 'mcg/min',
-                perKg: false,
-                perMin: true,
-                doseMin: 5,
-                doseMax: 100,
-                aviso: 'Iniciar com 1,5 ml/h e no máximo 30 ml/h.'
-            },
-            vasopressina: {
-                diluicoes: [
-                    { amp: '1ml (20UI)/49ml (0,4UI/ml)', concentracao: 1.0 },
-                    { amp: '2ml (40UI)/98ml (0,4UI/ml)', concentracao: 2.0 }
-                ],
-                unidadeDose: 'UI/min',
-                perKg: false,
-                perMin: true,
-                doseMin: 0.01,
-                doseMax: 0.04,
-                aviso: 'Dose inicial: 0.03 UI/min. Manutenção: 0.01 a 0.04 UI/min. > 0.04 UI/min causa isquemia cardíaca'
-},
-            epinefrina: {
-                diluicoes: [
-                    { amp: '1ml/100ml SG 5% (10mcg/ml)', concentracao: 0.01 },
-                    { amp: '1ml/250ml SG 5% (4mcg/ml)', concentracao: 0.004 },
-                    { amp: '5ml/250ml SG 5% (20mcg/ml)', concentracao: 0.02 }
-                ],
-                unidadeDose: 'mcg/kg/min',
-                perKg: true,
-                perMin: true,
-                doseMin: 0.05,
-                doseMax: 2,
-                aviso: ''
-            },
-            midazolam: {
-                diluicoes: [
-                    { amp: '30ml/220ml (0.6mg/ml)', concentracao: 0.6, calculoEspecial: (peso, dose) => peso * dose / 0.6 },
-                    { amp: '50ml/200ml (1mg/ml)', concentracao: 1, calculoEspecial: (peso, dose) => peso * dose },
-                    { amp: 'Ampola Pura (5 mg/ml)', concentracao: 5 }
-                ],
-                unidadeDose: 'mg/kg/h',
-                perKg: true,
-                perMin: false,
-                doseMin: 0.02,
-                doseMax: 0.6,
-                aviso: ''
-            },
-            fentanil: {
-                diluicoes: [
-                    { amp: '50ml/150ml (12,5mcg/ml)', concentracao: 0.0125 },
-                    { amp: '100ml/100ml (25mcg/ml)', concentracao: 0.025 },
-                    { amp: 'Ampola Pura (50mcg/ml)', concentracao: 0.05 }
-                ],
-                unidadeDose: 'mcg/kg/h',
-                perKg: true,
-                perMin: false,
-                doseMin: 0.7,
-                doseMax: 10,
-                aviso: ''
-            },
-            remifentanil: {
-                diluicoes: [{ amp: '10ml/190ml (50mcg/ml)', concentracao: 0.05 }],
-                unidadeDose: 'mcg/kg/h',
-                perKg: true,
-                perMin: false,
-                doseMin: 0.5,
-                doseMax: 15,
-                aviso: ''
-            },
-            escetamina: {
-                diluicoes: [{ amp: '20ml/230ml (4mg/ml)', concentracao: 4 }],
-                unidadeDose: 'mg/kg/h',
-                perKg: true,
-                perMin: false,
-                doseMin: 0.25,
-                doseMax: 0.5,
-                aviso: 'Contra indicado em Hipertensão intracraniana, insuficiência coronariana e distúrbios psiquiátricos'
-            },
-            propofol: {
-                diluicoes: [{ amp: '10mg/ml', concentracao: 10 }],
-                unidadeDose: 'mg/kg/h',
-                perKg: true,
-                perMin: false,
-                doseMin: 0.5,
-                doseMax: 5,
-                aviso: 'Iniciar com 0.5 e aumentar 0.5 a cada 5 a 10min. Trocar a solução a cada 6 a 12h. Síndrome de infusão do propofol ocorre em doses acima de 4mg/kg/h'
-            },
-            dexmedetomidina: {
-                diluicoes: [{ amp: '4ml/96 ml (4mcg/ml)', concentracao: 0.004 }],
-                unidadeDose: 'mcg/kg/h',
-                perKg: true,
-                perMin: false,
-                doseMin: 0.2,
-                doseMax: 1.5,
-                aviso: 'Iniciar com 0,5 ml/h e aumentar a cada 5 a 10min. Trocar a solução a cada 6 a 12h.'
-            },
-            pancuronio: {
-                diluicoes: [{ amp: '20ml/180 ml (0,2mg/ml)', concentracao: 0.2 }],
-                unidadeDose: 'mg/kg/h',
-                perKg: true,
-                perMin: false,
-                doseMin: 0.02,
-                doseMax: 0.3,
-                aviso: ''
-            },
-            rocuronio: {
-                diluicoes: [{ amp: '25ml/225ml (1mg/ml)', concentracao: 1 }],
-                unidadeDose: 'mg/kg/h',
-                perKg: true,
-                perMin: false,
-                doseMin: 0.3,
-                doseMax: 0.6,
-                aviso: ''
-            },
-            cisatracurio: {
-                diluicoes: [{ amp: '50ml/200 ml (0,5mg/ml)', concentracao: 0.5 }],
-                unidadeDose: 'mg/kg/h',
-                perKg: true,
-                perMin: false,
-                doseMin: 0.06,
-                doseMax: 0.8,
-                aviso: 'Dose inicial: 0.1 a 0.2 mg/kg bolus (ou 15mg bolus)'
-            }
-        };
-
+<script>
+const medicamentosConfig = {
+    noradrenalina: {
+        diluicoes: [
+            { amp: '8ml/242ml SG 5% (32mcg/ml)', concentracao: 0.032 },
+            { amp: '16ml/234ml SG 5% (64mcg/ml)', concentracao: 0.064 },
+            { amp: '32ml/218ml SG 5% (128mcg/ml)', concentracao: 0.128 }
+        ],
+        unidadeDose: 'mcg/kg/min',
+        perKg: true,
+        perMin: true,
+        doseMin: 0.02,
+        doseMax: 3.3,
+        aviso: 'Dose inicial: 0.05 a 0.15 mcg/kg/min. Manutenção: 0.025 a 1 mcg/kg/min. Máxima: 1 a 3.3 mcg/kg/min'
+    },
+    dobutamina: {
+        diluicoes: [
+            { amp: '20ml/230ml (1mg/ml)', concentracao: 1 },
+            { amp: '40ml/210ml (2mg/ml)', concentracao: 2 },
+            { amp: '80ml/170ml (4mg/ml)', concentracao: 4 }
+        ],
+        unidadeDose: 'mcg/kg/min',
+        perKg: true,
+        perMin: true,
+        doseMin: 2,
+        doseMax: 20,
+        aviso: 'Dose inicial: 2 a 5 mcg/kg/min. Manutenção: 2 a 10 mcg/kg/min. Máxima: 20 mcg/kg/min'
+    },
+    dopamina: {
+        diluicoes: [
+            { amp: '50ml/200ml (1mg/ml)', concentracao: 1 },
+            { amp: '100ml/150ml (2mg/ml)', concentracao: 2 }
+        ],
+        unidadeDose: 'mcg/kg/min',
+        perKg: true,
+        perMin: true,
+        doseMin: 2,
+        doseMax: 20,
+        aviso: 'Dose inicial: 2 a 5 mcg/kg/min. Manutenção: 2 a 20 mcg/kg/min. Máxima: 20 mcg/kg/min'
+    },
+    nitroprussiato: {
+        diluicoes: [
+            { amp: '2ml/248ml (0.2mg/ml)', concentracao: 0.2 },
+            { amp: '4ml/246ml (0.4mg/ml)', concentracao: 0.4 }
+        ],
+        unidadeDose: 'mcg/kg/min',
+        perKg: true,
+        perMin: true,
+        doseMin: 0.2,
+        doseMax: 10,
+        aviso: 'TFG <30ml/min/1,73m² - dose <3mcg/kg/min. Anúricos - dose de 1mcg/kg/min'
+    },
+    nitroglicerina: {
+        diluicoes: [
+            { amp: '5ml/245ml (0.1mg/ml)', concentracao: 0.1},
+            { amp: '10ml/240ml (0.2mg/ml)', concentracao: 0.2},
+            { amp: '20ml/230ml (0.4mg/ml)', concentracao: 0.4}
+        ],
+        unidadeDose: 'mcg/min',
+        perKg: false,
+        perMin: true,
+        doseMin: 5,
+        doseMax: 100,
+        aviso: 'Iniciar com 1,5 ml/h e no máximo 30 ml/h.'
+    },
+    vasopressina: {
+        diluicoes: [
+            { amp: '1ml (20UI)/49ml (0,4UI/ml)', concentracao: 1.0 },
+            { amp: '2ml (40UI)/98ml (0,4UI/ml)', concentracao: 2.0 }
+        ],
+        unidadeDose: 'UI/min',
+        perKg: false,
+        perMin: true,
+        doseMin: 0.01,
+        doseMax: 0.04,
+        aviso: 'Dose inicial: 0.03 UI/min. Manutenção: 0.01 a 0.04 UI/min. > 0.04 UI/min causa isquemia cardíaca'
+    },
+    epinefrina: {
+        diluicoes: [
+            { amp: '1ml/100ml SG 5% (10mcg/ml)', concentracao: 0.01 },
+            { amp: '1ml/250ml SG 5% (4mcg/ml)', concentracao: 0.004 },
+            { amp: '5ml/250ml SG 5% (20mcg/ml)', concentracao: 0.02 }
+        ],
+        unidadeDose: 'mcg/kg/min',
+        perKg: true,
+        perMin: true,
+        doseMin: 0.05,
+        doseMax: 2,
+        aviso: ''
+    },
+    midazolam: {
+        diluicoes: [
+            { amp: '30ml/220ml (0.6mg/ml)', concentracao: 0.6, calculoEspecial: (peso, dose) => peso * dose / 0.6 },
+            { amp: '50ml/200ml (1mg/ml)', concentracao: 1, calculoEspecial: (peso, dose) => peso * dose },
+            { amp: 'Ampola Pura (5 mg/ml)', concentracao: 5 }
+        ],
+        unidadeDose: 'mg/kg/h',
+        perKg: true,
+        perMin: false,
+        doseMin: 0.02,
+        doseMax: 0.6,
+        aviso: ''
+    },
+    fentanil: {
+        diluicoes: [
+            { amp: '50ml/150ml (12,5mcg/ml)', concentracao: 0.0125 },
+            { amp: '100ml/100ml (25mcg/ml)', concentracao: 0.025 },
+            { amp: 'Ampola Pura (50mcg/ml)', concentracao: 0.05 }
+        ],
+        unidadeDose: 'mcg/kg/h',
+        perKg: true,
+        perMin: false,
+        doseMin: 0.7,
+        doseMax: 10,
+        aviso: ''
+    },
+    remifentanil: {
+        diluicoes: [{ amp: '10ml/190ml (50mcg/ml)', concentracao: 0.05 }],
+        unidadeDose: 'mcg/kg/h',
+        perKg: true,
+        perMin: false,
+        doseMin: 0.5,
+        doseMax: 15,
+        aviso: ''
+    },
+    escetamina: {
+        diluicoes: [{ amp: '20ml/230ml (4mg/ml)', concentracao: 4 }],
+        unidadeDose: 'mg/kg/h',
+        perKg: true,
+        perMin: false,
+        doseMin: 0.25,
+        doseMax: 0.5,
+        aviso: 'Contra indicado em Hipertensão intracraniana, insuficiência coronariana e distúrbios psiquiátricos'
+    },
+    propofol: {
+        diluicoes: [{ amp: '10mg/ml', concentracao: 10 }],
+        unidadeDose: 'mg/kg/h',
+        perKg: true,
+        perMin: false,
+        doseMin: 0.5,
+        doseMax: 5,
+        aviso: 'Iniciar com 0.5 e aumentar 0.5 a cada 5 a 10min. Trocar a solução a cada 6 a 12h. Síndrome de infusão do propofol ocorre em doses acima de 4mg/kg/h'
+    },
+    dexmedetomidina: {
+        diluicoes: [{ amp: '4ml/96 ml (4mcg/ml)', concentracao: 0.004 }],
+        unidadeDose: 'mcg/kg/h',
+        perKg: true,
+        perMin: false,
+        doseMin: 0.2,
+        doseMax: 1.5,
+        aviso: 'Iniciar com 0,5 ml/h e aumentar a cada 5 a 10min. Trocar a solução a cada 6 a 12h.'
+    },
+    pancuronio: {
+        diluicoes: [{ amp: '20ml/180 ml (0,2mg/ml)', concentracao: 0.2 }],
+        unidadeDose: 'mg/kg/h',
+        perKg: true,
+        perMin: false,
+        doseMin: 0.02,
+        doseMax: 0.3,
+        aviso: ''
+    },
+    rocuronio: {
+        diluicoes: [{ amp: '25ml/225ml (1mg/ml)', concentracao: 1 }],
+        unidadeDose: 'mg/kg/h',
+        perKg: true,
+        perMin: false,
+        doseMin: 0.3,
+        doseMax: 0.6,
+        aviso: ''
+    },
+    cisatracurio: {
+        diluicoes: [{ amp: '50ml/200 ml (0,5mg/ml)', concentracao: 0.5 }],
+        unidadeDose: 'mg/kg/h',
+        perKg: true,
+        perMin: false,
+        doseMin: 0.06,
+        doseMax: 0.8,
+        aviso: 'Dose inicial: 0.1 a 0.2 mg/kg bolus (ou 15mg bolus)'
+    }
+};
 let hasCalculated = false;
 let resultadoValido = false;
 let lastValidPeso = '';
@@ -551,902 +519,378 @@ let lastValidTaxa = '';
 let pesoAnterior = '';
 let pesoConfirmado = false;
 let timeoutAvisoDose = null;
-
-
+let textoOriginalDoseUnit = '';
 const state = {
     modo: "dose",
-    peso: null,
-    medicamento: null,
-    diluicao: null,
-
-    dose: {
-        valor: '',
-        resultado: null
-    },
-
-    taxa: {
-        valor: '',
-        resultado: null
-    },
-
     memoria: {
-        dose: {
-            valor: '',
-            resultado: null
-        },
-        taxa: {
-            valor: '',
-            resultado: null
-        }
-}
+        dose: { valor: '', resultado: null },
+        taxa: { valor: '', resultado: null }
+    }
 };
-
-function resetResultado() {
-    const resultado = document.getElementById('resultado');
-    resultado.innerHTML = '';
-    resultado.classList.remove('erro', 'alerta');
-    hasCalculated = false;
-    resultadoValido = false;
-}
-
-function renderizarResultado(valorFormatado, tipo, unidadeTexto) {
-    const resultadoDiv = document.getElementById('resultado');
-
-    // 1. LIMPA tudo
-    resultadoDiv.classList.remove('erro', 'alerta');
-
-    // 2. TEXTO
-    resultadoDiv.innerHTML = `<strong>${unidadeTexto}:</strong> ${valorFormatado}`;
-
-    // 3. ESTILO
-    if (tipo === "erro") {
-        resultadoDiv.classList.add('erro');
-    }
-}
-
-function resetarDadosPorMudancaDePeso() {
-    const doseInput = document.getElementById('dose');
-    const resultadoDiv = document.getElementById('resultado');
-
-    // Limpa input principal
-    doseInput.value = '';
-
-    // Limpa estados de validação
-    lastValidDose = '';
-    if (typeof lastValidTaxa !== 'undefined') {
-        lastValidTaxa = '';
-    }
-
-    // Limpa memória dos modos
-    state.memoria.dose = { valor: '', resultado: '' };
-    state.memoria.taxa = { valor: '', resultado: '' };
-
-    // Reseta resultado visual
-    resultadoDiv.innerHTML = '';
-    resultadoDiv.classList.remove('erro', 'alerta');
-
-    // Reseta flags de controle
-    hasCalculated = false;
-    resultadoValido = false;
-
-    updateButtonState();
-}
-
-function createLucideIcons() {
-    // Remove ícones antigos para evitar duplicação
-    document.querySelectorAll('svg[data-lucide-icon]').forEach(svg => svg.remove());
-    
-    lucide.createIcons();
-}
-
-function validatePesoInput(input) {
+function validarCampo(input, tipo) {
     let value = input.value.replace(/\./g, ',');
-    
+    const config = medicamentosConfig[document.getElementById('medicamento').value];
     if (!value) {
-        lastValidPeso = '';
-        input.value = '';
-        input.classList.remove('invalid');   // limpa erro se apagar
-        return;
-    }
-
-    // Impede vírgula inválida ou múltiplas vírgulas
-    if (/^,/.test(value) || (value.match(/,/g) || []).length > 1) {
-        mostrarErroNoCampo(input);
-        input.value = lastValidPeso;
-        return;
-    }
-
-    // Permite apenas números e no máximo uma vírgula (até 3 casas decimais)
-    if (!/^[0-9]{0,3}(,[0-9]{0,3})?$/.test(value)) {
-        mostrarErroNoCampo(input);
-        input.value = lastValidPeso;
-        return;
-    }
-
-    const num = parseFloat(value.replace(',', '.'));
-
-    // === BLOQUEADOR DE PESO MÁXIMO 650 KG ===
-    if (!isNaN(num) && num > 650) {
-        mostrarErroNoCampo(input);
-        input.value = lastValidPeso;   // volta para o último valor válido
-        return;
-    }
-
-    // Se chegou aqui, o valor é válido
-    input.classList.remove('invalid');
-    input.value = value;
-    lastValidPeso = value;
-}
-
-function validateDoseInput(input) {
-    let value = input.value.replace(/\./g, ',');
-    const medicamento = document.getElementById('medicamento').value;
-    const config = medicamentosConfig[medicamento];
-
-    if (!value) {
-        lastValidDose = '';
         input.value = '';
         input.classList.remove('invalid');
+        if (tipo === 'peso') lastValidPeso = '';
+        else if (tipo === 'dose') lastValidDose = '';
+        else if (tipo === 'taxa') lastValidTaxa = '';
         return;
     }
-
-    // impede vírgula inválida
     if (/^,/.test(value) || (value.match(/,/g) || []).length > 1) {
-        mostrarErroNoCampo(input);
-        input.value = lastValidDose;
+        exibirFeedbackErro(input);
+        restaurarUltimoValorValido(input, tipo);
         return;
     }
-
-    // padrão numérico
-    if (!/^[0-9]{0,6}(,[0-9]*)?$/.test(value)) {
-        mostrarErroNoCampo(input);
-        input.value = lastValidDose;
+    let regex, maxValue, maxDecimals;
+    if (tipo === 'peso') {
+        regex = /^[0-9]{0,3}(,[0-9]{0,3})?$/;
+        maxValue = 650;
+        maxDecimals = 3;
+    } else if (tipo === 'dose') {
+        regex = /^[0-9]{0,3}(,[0-9]{0,2})?$/;
+        maxValue = config ? config.doseMax : Infinity;
+        maxDecimals = 2;
+    } else if (tipo === 'taxa') {
+        regex = /^[0-9]{0,3}(,[0-9]{0,2})?$/;
+        maxValue = 999;
+        maxDecimals = 2;
+    }
+    if (!regex.test(value)) {
+        exibirFeedbackErro(input);
+        restaurarUltimoValorValido(input, tipo);
         return;
     }
-
-    // LIMITA PARA 2 CASAS DECIMAIS
     if (value.includes(',')) {
         const partes = value.split(',');
-        if (partes[1].length > 2) {
-            mostrarErroNoCampo(input);
-            input.value = lastValidDose;
+        if (partes[1].length > maxDecimals) {
+            exibirFeedbackErro(input);
+            restaurarUltimoValorValido(input, tipo);
             return;
         }
     }
-
     const num = parseFloat(value.replace(',', '.'));
-
-    if (isNaN(num)) {
-        input.value = lastValidDose;
+    if (tipo === 'dose' && config && !isNaN(num)) {
+        const doseMin = config.doseMin;
+    if (doseMin >= 1) {
+        if (value.startsWith('0')) {
+            exibirFeedbackErro(input);
+            restaurarUltimoValorValido(input, tipo);
+            return;
+        }
+        if (num < doseMin) {
+            exibirFeedbackErro(input);
+            restaurarUltimoValorValido(input, tipo);
+            return;
+        }
+    }
+    else {
+        if (num < doseMin) {
+            const partes = value.split(',');
+            const inteiro = partes[0];
+            const decimal = partes[1] || '';
+            if (value === '0' || value.endsWith(',')) return;
+            const valorPossivelMax = parseFloat(
+                (inteiro + ',' + decimal.padEnd(2, '9')).replace(',', '.')
+            );
+            if (valorPossivelMax < doseMin) {
+                exibirFeedbackErro(input);
+                restaurarUltimoValorValido(input, tipo);
+                return;
+            }
+        }
+    }
+}
+    if (!isNaN(num) && num > maxValue) {
+        if (tipo === 'dose') {
+            exibirFeedbackErro(input, `Máximo: ${config.doseMax}`);
+        } else if (tipo === 'peso') {
+            exibirFeedbackErro(input);
+        }
+        restaurarUltimoValorValido(input, tipo);
         return;
     }
-
-    // === BLOQUEIO DO RANGE ===
-    if (config) {
-        if (num > config.doseMax) {
-            mostrarErroNoCampo(input, `Máximo: ${config.doseMax}`);
-            input.value = lastValidDose;
-            return;
-        }
-        
-    }
-
-    // Se chegou aqui, o valor é válido
     input.classList.remove('invalid');
     input.value = value;
-    lastValidDose = value;
+    if (tipo === 'peso') lastValidPeso = value;
+    else if (tipo === 'dose') lastValidDose = value;
+    else if (tipo === 'taxa') lastValidTaxa = value;
 }
-
-// função para feedback visual de erro
-function mostrarErroNoCampo(input, mensagem = '') {
+function restaurarUltimoValorValido(input, tipo) {
+    if (tipo === 'peso') input.value = lastValidPeso || '';
+    else if (tipo === 'dose') input.value = lastValidDose || '';
+    else if (tipo === 'taxa') input.value = lastValidTaxa || '';
+}
+function exibirFeedbackErro(input, mensagem = '') {
     input.classList.add('invalid');
-    
-    // Remove a classe depois de 1 segundo
-    setTimeout(() => {
-        input.classList.remove('invalid');
-    }, 800);
-
-    // mostrar mensagem temporária
+    setTimeout(() => input.classList.remove('invalid'), 800);
+    const small = document.getElementById('doseUnit');
     if (mensagem) {
-        const small = document.getElementById('doseUnit');
-        
-        if (timeoutAvisoDose) {
-        clearTimeout(timeoutAvisoDose);
-    }
-        
-        const medicamento = document.getElementById('medicamento').value;
-        const config = medicamentosConfig[medicamento];
-
-const originalText = state.modo === "dose"
-    ? config.unidadeDose
-    : "ml/h";
-        
+        if (!textoOriginalDoseUnit) textoOriginalDoseUnit = small.textContent;
+        if (timeoutAvisoDose) clearTimeout(timeoutAvisoDose);
         small.style.color = 'var(--error)';
         small.textContent = mensagem;
-
-timeoutAvisoDose = setTimeout(() => {
-    small.style.color = '';
-    small.textContent = originalText;
-    timeoutAvisoDose = null;
- }, 1500);
+        timeoutAvisoDose = setTimeout(() => {
+            small.style.color = '';
+            small.textContent = textoOriginalDoseUnit;
+            timeoutAvisoDose = null;
+        }, 1500);
     }
 }
+function calcularValor(dose, config, peso, dil) {
+    let dosePorHora = dose;
+    if (config.perKg) dosePorHora *= peso;
+    if (config.perMin) dosePorHora *= 60;
+    const isMcg = config.unidadeDose.startsWith('mcg');
+    const doseConvertida = isMcg ? dosePorHora / 1000 : dosePorHora;
+if (dil.calculoEspecial) {
+    return dil.calculoEspecial(peso, dose);
+}
+return (doseConvertida / dil.concentracao);
+}
+function processarCalculo() {
+    const config = medicamentosConfig[document.getElementById('medicamento').value];
+    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.')) || 1;
+    if (!config.perKg) {
+    peso = 1;
+}
+    const dose = parseFloat(document.getElementById('dose').value.replace(',', '.'));
+    const dil = config.diluicoes[parseInt(document.getElementById('dilution').value)];
+    const resultadoDiv = document.getElementById('resultado');
+    if (!dil) return mostrarErro(resultadoDiv, 'Diluição inválida.');
+    if (config.perKg && (isNaN(peso) || peso <= 0)) return mostrarErro(resultadoDiv, 'Insira um peso válido.');
+    if (isNaN(dose) || dose <= 0) return mostrarErro(resultadoDiv, 'Insira uma dose válida.');
+    const isMcg = config.unidadeDose.startsWith('mcg');
+    if (state.modo === "dose") {
+        const taxa = calcularValor(dose, config, peso, dil);
+        renderizarResultado(taxa, "Taxa de infusão", "ml/h");
 
-function mostrarAlerta(element, mensagem) {
+        state.memoria.dose = (dose >= config.doseMin && dose <= config.doseMax)
+            ? { valor: document.getElementById('dose').value, resultado: { tipo: "normal", valor: taxa } }
+            : { valor: '', resultado: null };
+    } else {
+        let doseBase = dose * dil.concentracao;
+        if (config.perMin) doseBase /= 60;
+        if (config.perKg) doseBase /= peso;
+        const doseCalculada = (isMcg ? doseBase * 1000 : doseBase);
+        if (doseCalculada < config.doseMin || doseCalculada > config.doseMax) {
+            const taxaMin = calcularValor(config.doseMin, config, peso, dil);
+            const taxaMax = calcularValor(config.doseMax, config, peso, dil);
+            renderizarAlerta(doseCalculada, taxaMin, taxaMax, config.unidadeDose);
+            state.memoria.taxa = { valor: document.getElementById('dose').value, resultado: { tipo: "alerta" } };
+        } else {
+            renderizarResultado(doseCalculada, "Dose", config.unidadeDose);
+            state.memoria.taxa = { valor: document.getElementById('dose').value, resultado: { tipo: "normal", valor: doseCalculada } };
+        }
+    }
+    hasCalculated = true;
+    resultadoValido = true;
+    if (document.getElementById('peso').value) {
+        pesoAnterior = document.getElementById('peso').value;
+        pesoConfirmado = true;
+    }
+}
+function atualizarInterfaceMedicamento() {
+    const config = medicamentosConfig[document.getElementById('medicamento').value];
+    if (!config) return;
+    document.getElementById('doseUnit').textContent = state.modo === "dose" ? config.unidadeDose : "ml/h";
+    document.getElementById('doseRange').textContent = `Dose recomendada: ${config.doseMin} - ${config.doseMax} ${config.unidadeDose}`;
+    const avisoElement = document.getElementById('aviso');
+    if (config.aviso) {
+        const items = config.aviso.split('. ').map(s => s.trim()).filter(Boolean)
+            .map(item => `<div class="aviso-item">• ${item.replace(/\.$/, '')}.</div>`).join('');
+        avisoElement.innerHTML = `<div class="aviso-inner"><i data-lucide="alert-triangle" class="aviso-icon"></i><div class="aviso-text">${items}</div></div>`;
+        avisoElement.style.display = 'block';
+        createLucideIcons();
+    } else {
+        avisoElement.style.display = 'none';
+    }
+    const select = document.getElementById('dilution');
+    select.innerHTML = '';
+    config.diluicoes.forEach((dil, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = dil.amp;
+        select.appendChild(opt);
+    });
+    const label = document.getElementById('labelDilution');
+    if (config.diluicoes.length === 1) {
+        select.classList.add('single-option');
+        select.disabled = true;
+        label.textContent = "Diluição:";
+    } else {
+        select.classList.remove('single-option');
+        select.disabled = false;
+        label.textContent = "Selecione a Diluição:";
+    }
+    const pesoContainer = document.getElementById('pesoContainer');
+    const pesoInput = document.getElementById('peso');
+    if (config.perKg) {
+        pesoContainer.style.display = 'block';
+        pesoInput.required = true;
+    } else {
+        pesoContainer.style.display = 'none';
+        pesoInput.value = '';
+        pesoInput.required = false;
+    }
+    atualizarEstadoBotaoCalcular();
+}
+function atualizarEstadoBotaoCalcular() {
+    const config = medicamentosConfig[document.getElementById('medicamento').value];
+    if (!config) return;
+    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.')) || 0;
+    if (!config.perKg) peso = 1;
+    const dose = parseFloat(document.getElementById('dose').value.replace(',', '.')) || 0;
+    const isPesoValid = !config.perKg || (peso > 0 && peso <= 650);
+    const isDoseValid = dose > 0;
+    const isDilutionValid = !isNaN(parseInt(document.getElementById('dilution').value));
+    document.querySelector('button[type="submit"]').disabled = !(isPesoValid && isDoseValid && isDilutionValid);
+}
+function resetResultado() {
+    const div = document.getElementById('resultado');
+    div.innerHTML = '';
+    div.classList.remove('erro', 'alerta');
+    hasCalculated = false;
+    resultadoValido = false;
+}
+function renderizarResultado(valor, titulo, unidade) {
+    const div = document.getElementById('resultado');
+    div.classList.remove('erro', 'alerta');
+
+    const valorFormatado = Number(valor).toFixed(2);
+
+    div.innerHTML = `<strong>${titulo}:</strong> ${valorFormatado} ${unidade}`;
+}
+function renderizarAlerta(valorCalculado, taxaMin, taxaMax, unidadeDose) {
+    const div = document.getElementById('resultado');
+    div.classList.add('erro');
+    div.innerHTML = `
+        <div class="aviso-inner" style="text-align: left;">
+            <i data-lucide="alert-triangle" class="aviso-icon"></i>
+            <div class="aviso-text">
+                <div class="aviso-item">• Dose calculada: ${Number(valorCalculado).toFixed(2)} ${unidadeDose}</div>
+                <div class="aviso-item">• Taxa recomendada: ${Number(taxaMin).toFixed(2)} - ${Number(taxaMax).toFixed(2)} ml/h</div>
+            </div>
+        </div>
+    `;
+    createLucideIcons();
+}
+function mostrarErro(element, mensagem) {
     element.innerHTML = `
         <div class="aviso-inner">
             <i data-lucide="alert-triangle" class="aviso-icon"></i>
             <div class="aviso-text">${mensagem}</div>
         </div>
     `;
-    element.classList.remove('erro');
-    createLucideIcons();
-}
-
-function renderizarAlerta(valorCalculado, taxaMin, taxaMax, unidadeDose) {
-    const resultadoDiv = document.getElementById('resultado');
-
-    resultadoDiv.classList.remove('alerta');
-    resultadoDiv.classList.add('erro');
-
-    resultadoDiv.innerHTML = `
-        <div class="aviso-inner" style="text-align: left;">
-        <i data-lucide="alert-triangle" class="aviso-icon aviso-icon-triangulo"></i>
-        <div class="aviso-text">
-                <div class="aviso-item">
-                    • Dose calculada: ${valorCalculado} ${unidadeDose}
-                </div>
-
-                <div class="aviso-item">
-                    • Situação: fora da faixa recomendada
-                </div>
-
-                <div class="aviso-item">
-                    • Taxa de infusão recomendada: ${taxaMin} - ${taxaMax} ml/h
-                </div>
-            </div>
-
-        </div>
-    `;
-    createLucideIcons();
-}
-
-function sincronizarCalculos() {
-    const medicamento = document.getElementById('medicamento').value;
-    const config = medicamentosConfig[medicamento];
-
-    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
-    if (!config.perKg) peso = 1;
-
-    const dilutionIndex = parseInt(document.getElementById('dilution').value);
-    const dil = config.diluicoes[dilutionIndex];
-
-    if (!dil || (config.perKg && (!peso || peso <= 0))) return;
-
-    // DOSE → TAXA
-    if (state.dose.valor) {
-        const dose = parseFloat(state.dose.valor.replace(',', '.'));
-        if (!isNaN(dose) && dose > 0) {
-            state.taxa.resultado = calcularTaxa(dose);
-        }
-    }
-
-    // TAXA → DOSE
-    if (state.taxa.valor) {
-        const taxa = parseFloat(state.taxa.valor.replace(',', '.'));
-        if (!isNaN(taxa) && taxa > 0) {
-
-            let doseBase = taxa * dil.concentracao;
-
-            if (config.perMin) doseBase /= 60;
-            if (config.perKg) doseBase /= peso;
-
-            const isMcg = config.unidadeDose.startsWith('mcg');
-            let doseFinal = isMcg ? doseBase * 1000 : doseBase;
-
-            state.dose.resultado = parseFloat(doseFinal.toFixed(2));
-        }
-    }
-}
-
-function validarTaxaInfusao(input) {
-    let value = input.value.replace(/\./g, ',');
-
-    if (!value) {
-        lastValidTaxa = '';
-        input.value = '';
-        return;
-    }
-
-    if (/^,/.test(value) || (value.match(/,/g) || []).length > 1) {
-        input.value = lastValidTaxa;
-        return;
-    }
-
-    if (!/^[0-9]{0,3}(,[0-9]{0,2})?$/.test(value)) {
-        input.value = lastValidTaxa;
-        return;
-    }
-
-    const num = parseFloat(value.replace(',', '.'));
-
-    if (isNaN(num)) {
-        input.value = lastValidTaxa;
-        return;
-    }
-
-    // LIMITE TÉCNICO DA TAXA
-    if (num > 999) {
-        input.value = lastValidTaxa;
-        return;
-    }
-
-    input.value = value;
-    lastValidTaxa = value;
-}
-
-function atualizarEstiloResultado(valor, config, resultadoDiv) {
-    if (!config) return;
-
-    resultadoDiv.classList.remove('erro', 'alerta');
-
-    if (valor < config.doseMin || valor > config.doseMax) {
-        resultadoDiv.classList.add('erro'); // vermelho
-    }
-}
-
-function updateDoseInfo() {
-    const medicamento = document.getElementById('medicamento').value;
-    const config = medicamentosConfig[medicamento];
-    if (!config) return;
-
-    document.getElementById('doseUnit').textContent =
-        state.modo === "dose" ? config.unidadeDose : "ml/h";
-
-    document.getElementById('doseRange').textContent =
-        `Dose recomendada: ${config.doseMin} - ${config.doseMax} ${config.unidadeDose}`;
-
-    const avisoElement = document.getElementById('aviso');
-    
-    if (config.aviso) {
-    const items = config.aviso.split('. ').map(s => s.trim()).filter(Boolean)
-        .map(item => `<div class="aviso-item">• ${item.replace(/\.$/, '')}.</div>`).join('');
-
-    avisoElement.innerHTML = `
-        <div class="aviso-inner">
-            <i data-lucide="alert-triangle" class="aviso-icon"></i>
-            <div class="aviso-text">${items}</div>
-        </div>
-    `;
-    avisoElement.style.display = 'block';
-    createLucideIcons();
-} else {
-    avisoElement.style.display = 'none';
-}
-
-    const dilutionSelect = document.getElementById('dilution');
-    dilutionSelect.innerHTML = '';
-    config.diluicoes.forEach((dil, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.textContent = dil.amp;
-        dilutionSelect.appendChild(option);
-    });
-
-const labelDilution = document.getElementById('labelDilution');
-if (config.diluicoes.length === 1) {
-    dilutionSelect.classList.add('single-option');
-    dilutionSelect.disabled = true; // trava o select
-    labelDilution.textContent = "Diluição:";
-} else {
-    dilutionSelect.classList.remove('single-option');
-    dilutionSelect.disabled = false; // libera o select
-    labelDilution.textContent = "Selecione a Diluição:";
-}
-
-const pesoContainer = document.getElementById('pesoContainer');
-const pesoInput = document.getElementById('peso');
-if (config.perKg) {
-    pesoContainer.style.display = 'block';
-    pesoInput.required = true;
-} else {
-    pesoContainer.style.display = 'none';
-    pesoInput.value = '';
-    pesoInput.required = false;
-}
-
-if (!hasCalculated) {
-    document.getElementById('dose').value = '';
-    resetResultado();
-}
-    updateButtonState();
-}
-
-function updateButtonState() {
-    const medicamento = document.getElementById('medicamento').value;
-    const config = medicamentosConfig[medicamento];
-    if (!config) return;
-
-    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
-    if (!config.perKg) peso = 1;
-
-    const dose = parseFloat(document.getElementById('dose').value.replace(',', '.'));
-    const dilutionIndex = parseInt(document.getElementById('dilution').value);
-
-    const isPesoValid = !config.perKg || (!isNaN(peso) && peso > 0 && peso <= 650);
-    const isDoseValid = !isNaN(dose) && dose > 0;
-    const isDilutionValid = !isNaN(dilutionIndex);
-
-    document.querySelector('button[type="submit"]').disabled =
-        !(isPesoValid && isDoseValid && isDilutionValid);
-}
-
-function calcularTaxa(dose) {
-    const medicamento = document.getElementById('medicamento').value;
-    const config = medicamentosConfig[medicamento];
-
-    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
-    if (!config.perKg) peso = 1;
-
-    const dilutionIndex = parseInt(document.getElementById('dilution').value);
-    const dil = config.diluicoes[dilutionIndex];
-
-    const isMcg = config.unidadeDose.startsWith('mcg');
-    const isUI = config.unidadeDose.startsWith('UI');
-
-    let dosePorHora = dose;
-
-    if (config.perKg) dosePorHora *= peso;
-    if (config.perMin) dosePorHora *= 60;
-
-    let doseConvertida;
-
-    if (isMcg) doseConvertida = dosePorHora / 1000;
-    else doseConvertida = dosePorHora;
-
-    let taxa = doseConvertida / dil.concentracao;
-
-    return parseFloat(taxa.toFixed(2));
-}
-
-function recalcularSePossivel() {
-    const medicamento = document.getElementById('medicamento').value;
-    const config = medicamentosConfig[medicamento];
-
-    const doseInput = document.getElementById('dose').value;
-    const pesoInput = document.getElementById('peso').value;
-    const dilution = document.getElementById('dilution').value;
-
-    if (!doseInput || dilution === '') return;
-
-    if (config.perKg) {
-        const peso = parseFloat(pesoInput.replace(',', '.'));
-        if (isNaN(peso) || peso <= 0) return;
-    }
-
-    const valor = parseFloat(doseInput.replace(',', '.'));
-    if (isNaN(valor) || valor <= 0) return;
-
-    calcularTaxaInfusao();
-}
-
-function calcularTaxaInfusao() {
-    const medicamento = document.getElementById('medicamento').value;
-    const config = medicamentosConfig[medicamento];
-
-    let peso = parseFloat(document.getElementById('peso').value.replace(',', '.'));
-    if (!config.perKg) peso = 1;
-    const dose = parseFloat(document.getElementById('dose').value.replace(',', '.'));
-    const dilutionIndex = parseInt(document.getElementById('dilution').value);
-
-    const resultadoDiv = document.getElementById('resultado');
-
-if (!hasCalculated) {
-    resultadoDiv.innerHTML = '';
-    resultadoDiv.classList.remove('erro');
-}
-    const dil = config.diluicoes[dilutionIndex];
-
-    if (!dil) {
-        mostrarErro(resultadoDiv, 'Diluição inválida.');
-        return false;
-    }
-
-    if (config.perKg && (isNaN(peso) || peso <= 0)) {
-        mostrarErro(resultadoDiv, 'Insira um peso válido.');
-        return false;
-    }
-
-    if (isNaN(dose) || dose <= 0) {
-        mostrarErro(resultadoDiv, 'Insira uma dose válida.');
-        return false;
-    }
-
-  if (state.modo === "dose") {
-    if (dose < config.doseMin || dose > config.doseMax) {
-        mostrarErro(resultadoDiv, `Dose fora do range (${config.doseMin} - ${config.doseMax} ${config.unidadeDose})`);
-        return false;
-    }
-}
-
-   const isMcg = config.unidadeDose.startsWith('mcg');
-   const isUI = config.unidadeDose.startsWith('UI');
-    let taxaMlH = 0;
-    let doseCalculada = 0;
-
-    if (state.modo === "dose") {
-        let dosePorHora = dose;
-        if (config.perKg) dosePorHora *= peso;
-        if (config.perMin) dosePorHora *= 60;
-
-       let doseConvertida;
-
-if (isMcg) {
-    doseConvertida = dosePorHora / 1000; // mcg → mg
-} else if (isUI) {
-    doseConvertida = dosePorHora; // UI → mantém
-} else {
-    doseConvertida = dosePorHora; // mg
-}
-       if (dil.calculoEspecial) {
-    taxaMlH = dil.calculoEspecial(peso, dose);
-} else {
-    taxaMlH = doseConvertida / dil.concentracao;
-}
-
-        taxaMlH = parseFloat(taxaMlH.toFixed(2));
-
-        if (false) {
-
-    let taxaMin = calcularTaxa(config.doseMin);
-    let taxaMax = calcularTaxa(config.doseMax);
-
-    renderizarAlerta(
-        taxaMlH,
-        taxaMin,
-        taxaMax,
-        config.unidadeDose
-    );
-
-    //SALVA ALERTA
-    state.memoria.dose.resultado = {
-        tipo: "alerta",
-        valor: taxaMlH,
-        taxaMin: taxaMin,
-        taxaMax: taxaMax
-    };
-
-} else {
-
-    renderizarResultado(
-        `${taxaMlH} ml/h`,
-        "normal",
-        "Taxa de infusão"
-    );
-
-    //SALVA NORMAL
-   if (dose >= config.doseMin && dose <= config.doseMax) {
-   
-    state.memoria.dose.valor = document.getElementById('dose').value;
-
-    state.memoria.dose.resultado = {
-        tipo: "normal",
-        valor: taxaMlH
-    };
-} else {
-    // NÃO SALVA ALERTA
-    state.memoria.dose = { valor: '', resultado: null };
-}
-}
-
-    } else {
-        taxaMlH = dose;
-
-let doseBase = taxaMlH * dil.concentracao;
-
-// ajusta tempo
-if (config.perMin) doseBase /= 60;
-
-// ajusta peso
-if (config.perKg) doseBase /= peso;
-
-// converte unidade
-if (isMcg) {
-    doseCalculada = doseBase * 1000; // mg → mcg
-} else if (isUI) {
-    doseCalculada = doseBase; // UI → mantém
-} else {
-    doseCalculada = doseBase; // mg → mantém
-}
-        doseCalculada = parseFloat(doseCalculada.toFixed(2));
-
-if (doseCalculada < config.doseMin || doseCalculada > config.doseMax) {
-
-    let taxaMin = calcularTaxa(config.doseMin);
-    let taxaMax = calcularTaxa(config.doseMax);
-
-    renderizarAlerta(
-        doseCalculada,
-        taxaMin,
-        taxaMax,
-        config.unidadeDose
-    );
-} else {
-    renderizarResultado(
-        `${doseCalculada} ${config.unidadeDose}`,
-        "normal",
-        "Dose"
-    );
-}
-
-// salva estado correto
-if (doseCalculada >= config.doseMin && doseCalculada <= config.doseMax) {
-    
-    state.memoria.taxa.valor = document.getElementById('dose').value;
-
-    state.memoria.taxa.resultado = {
-        tipo: "normal",
-        valor: doseCalculada
-    };
-} else {
-    // NÃO SALVA ALERTA
-    state.memoria.taxa = { valor: '', resultado: null };
-}
-    }
-
-hasCalculated = true;
-resultadoValido = true;
-
-if (false) {
-
-}
-// MARCA PESO COMO CONFIRMADO
-const pesoInput = document.getElementById('peso').value;
-if (pesoInput) {
-    pesoAnterior = pesoInput;
-    pesoConfirmado = true;
-}
-
-return true;
-}
-
-function mostrarErro(element, mensagem) {
-    element.innerHTML = `
-    <div class="aviso-inner">
-        <i data-lucide="alert-triangle" class="aviso-icon"></i>
-        <div class="aviso-text">${mensagem}</div>
-    </div>
-`;
-    element.classList.remove('alerta');
     element.classList.add('erro');
     createLucideIcons();
 }
+function createLucideIcons() {
+    lucide.createIcons();
+}
+function resetarAoAlterarPeso() {
+    document.getElementById('dose').value = '';
+    lastValidDose = '';
+    lastValidTaxa = '';
+    state.memoria.dose = { valor: '', resultado: null };
+    state.memoria.taxa = { valor: '', resultado: null };
+    resetResultado();
+    atualizarEstadoBotaoCalcular();
+}
+function alternarModoDoseTaxa() {
+    const doseInput = document.getElementById("dose");
+    const config = medicamentosConfig[document.getElementById('medicamento').value];
 
-/* EVENTOS */
-
+    if (state.modo === "dose") {
+        doseInput.value = state.memoria.dose.valor || '';
+        if (state.memoria.dose.resultado?.tipo === "normal") {
+            renderizarResultado(`${state.memoria.dose.resultado.valor} ml/h`, "Taxa de infusão");
+        } else resetResultado();
+    } else {
+        if (state.memoria.taxa.resultado?.tipo === "alerta") {
+            doseInput.value = '';
+            resetResultado();
+            state.memoria.taxa = { valor: '', resultado: null };
+        } else {
+            doseInput.value = state.memoria.taxa.valor || '';
+            if (state.memoria.taxa.resultado?.tipo === "normal") {
+                renderizarResultado(`${state.memoria.taxa.resultado.valor} ${config.unidadeDose}`, "Dose");
+            } else resetResultado();
+        }
+    }
+    document.getElementById('doseUnit').textContent = state.modo === "dose" ? config.unidadeDose : "ml/h";
+    atualizarEstadoBotaoCalcular();
+}
+function tentarRecalcularAutomatico() {
+    if (document.getElementById('dose').value.trim()) processarCalculo();
+}
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
+    atualizarInterfaceMedicamento();
 });
-
 document.getElementById('medicamento').addEventListener('change', () => {
-    state.memoria.dose = { valor: '', resultado: '' };
-    state.memoria.taxa = { valor: '', resultado: '' };
+    state.memoria.dose = { valor: '', resultado: null };
+    state.memoria.taxa = { valor: '', resultado: null };
     hasCalculated = false;
-
-    updateDoseInfo();
-    recalcularSePossivel();
-    sincronizarCalculos();
+    document.getElementById('dose').value = '';
+    lastValidDose = '';
+    resetResultado();
+    atualizarInterfaceMedicamento();
 });
-
 document.getElementById('dilution').addEventListener('change', () => {
-    updateButtonState();
-    
-    // FORÇA recálculo imediato se já houver valor digitado
-    const doseInput = document.getElementById('dose').value.trim();
-    if (doseInput && doseInput !== '') {
-        calcularTaxaInfusao();        // recálculo imediato
-    } else {
-        recalcularSePossivel();
-    }
-    
-    sincronizarCalculos();
+    atualizarEstadoBotaoCalcular();
+    tentarRecalcularAutomatico();
 });
-
 document.getElementById('peso').addEventListener('input', function() {
-    validatePesoInput(this);
-    sincronizarCalculos();
-
+    validarCampo(this, 'peso');
     const pesoAtual = this.value;
-
-    // CASO 1: CAMPO FOI APAGADO → RESET IMEDIATO
     if (!pesoAtual) {
-        if (pesoConfirmado) {
-            resetarDadosPorMudancaDePeso();
-        }
-
+        if (pesoConfirmado) resetarAoAlterarPeso();
         pesoAnterior = '';
         pesoConfirmado = false;
-        updateButtonState();
+        atualizarEstadoBotaoCalcular();
         return;
     }
-
-    // CASO 2: PRIMEIRA DIGITAÇÃO (AINDA NÃO CONFIRMADO)
     if (!pesoConfirmado) {
-        // ainda está digitando → NÃO resetar
         pesoAnterior = pesoAtual;
-        updateButtonState();
+        atualizarEstadoBotaoCalcular();
         return;
     }
-
-    // CASO 3: JÁ CONFIRMADO E VALOR MUDOU → RESET
-    if (pesoAtual !== pesoAnterior) {
-        resetarDadosPorMudancaDePeso();
-    }
-
-    // atualiza referência
+    if (pesoAtual !== pesoAnterior) resetarAoAlterarPeso();
     pesoAnterior = pesoAtual;
-
-    updateButtonState();
+    atualizarEstadoBotaoCalcular();
 });
-
-document.getElementById('peso').addEventListener('blur', function() {
-    const pesoAtual = this.value;
-
-    // se vazio → apenas limpa estado
-    if (!pesoAtual) {
-        pesoAnterior = '';
-        return;
-    }
-
-    // primeiro valor → só salva
-    if (!pesoAnterior) {
-        pesoAnterior = pesoAtual;
-        return;
-    }
-
-    // RESET
-    if (pesoAtual !== pesoAnterior) {
-        resetarDadosPorMudancaDePeso();
-    }
-
-    pesoAnterior = pesoAtual;
-});
-
 document.getElementById('dose').addEventListener('input', function() {
-resetResultado();
+    validarCampo(this, state.modo === "dose" ? 'dose' : 'taxa');
 
-    if (state.modo === "dose") {
-        validateDoseInput(this);
-    } else {
-        validarTaxaInfusao(this);
-    }
-
-    // INVALIDA RESULTADO AO EDITAR
     if (resultadoValido) {
         resetResultado();
-
-        // limpa apenas o resultado do modo atual
-        if (state.modo === "dose") {
-            state.memoria.dose.resultado = '';
-        } else {
-            state.memoria.taxa.resultado = '';
-        }
+        if (state.modo === "dose") state.memoria.dose.resultado = null;
+        else state.memoria.taxa.resultado = null;
     }
-
-    updateButtonState();
+    atualizarEstadoBotaoCalcular();
 });
-
-document.getElementById('calcForm').addEventListener('submit', function(e) {
+document.getElementById('calcForm').addEventListener('submit', e => {
     e.preventDefault();
-    calcularTaxaInfusao();
+    processarCalculo();
 });
-
-function atualizarModo() {
-    const doseInput = document.getElementById("dose");
-    const resultadoDiv = document.getElementById("resultado");
-    const medicamento = document.getElementById('medicamento').value;
-    const config = medicamentosConfig[medicamento];
-    if (state.modo === "dose") {
-        doseInput.value = state.memoria.dose.valor;
-
-    if (state.memoria.dose.resultado) {
-        const resultado = state.memoria.dose.resultado;
-
-if (state.modo === "taxa") {
-    if (!state.taxa.valor || !state.taxa.resultado) {
-        doseInput.value = '';
-        resultadoDiv.innerHTML = '';
-        resultadoDiv.classList.remove('erro', 'alerta');
-        return;
-    }
-}
-
-if (resultado) {
-
-    if (resultado.tipo === "alerta") {
-
-        renderizarAlerta(
-            resultado.valor,
-            resultado.taxaMin,
-            resultado.taxaMax,
-            config.unidadeDose
-        );
-
-    } else {
-
-        renderizarResultado(
-            `${resultado.valor} ${
-                state.modo === "dose" ? "ml/h" : config.unidadeDose
-            }`,
-            "normal",
-            state.modo === "dose" ? "Taxa de infusão" : "Dose"
-        );
-
-    }
-
-} else {
-    resultadoDiv.innerHTML = '';
-}
-    
-        const texto = resultadoDiv.innerText;
-        const valor = parseFloat(texto.replace(',', '.').match(/[\d.]+/));
-
-} else {
-    resultadoDiv.innerHTML = '';
-}
-
-} else {
-    doseInput.value = state.memoria.taxa.valor;
-
-    if (state.memoria.taxa.resultado) {
-        const resultado = state.memoria.taxa.resultado;
-
-        const medicamento = document.getElementById('medicamento').value;
-        const config = medicamentosConfig[medicamento];
-
-    if (resultado) {
-        renderizarResultado(
-           `${resultado.valor} ${config.unidadeDose}`,
-           resultado.tipo,
-           "Dose"
-       );
-    }
-       
-        const texto = resultadoDiv.innerText;
-        const valor = parseFloat(texto.replace(',', '.').match(/[\d.]+/));
-   
-    } else {
-        resultadoDiv.innerHTML = '';
-    }
-}
-
-    document.getElementById('doseUnit').textContent =
-        state.modo === "dose" ? config.unidadeDose : "ml/h";
-
-    updateButtonState();
-}
-
 const btnDose = document.getElementById("modoDose");
 const btnTaxa = document.getElementById("modoTaxa");
-
 btnDose.addEventListener("click", () => {
     state.modo = "dose";
     btnDose.classList.add("ativo");
     btnTaxa.classList.remove("ativo");
-    atualizarModo();
-    recalcularSePossivel();
+    alternarModoDoseTaxa();
+    tentarRecalcularAutomatico();
 });
-
 btnTaxa.addEventListener("click", () => {
     state.modo = "taxa";
     btnTaxa.classList.add("ativo");
     btnDose.classList.remove("ativo");
-    atualizarModo();
-    recalcularSePossivel();
+    alternarModoDoseTaxa();
+    tentarRecalcularAutomatico();
 });
-
-updateDoseInfo();
-
 </script>
 </body>
 </html>
